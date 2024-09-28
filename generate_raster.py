@@ -82,8 +82,7 @@ xvals = above_interp(y_vals)
 # Visualizar os clusters e contornos
 pl = pv.Plotter()
 pl.add_mesh(pv.PolyData(points), color='red', point_size=10)
-# pl.add_points(np.column_stack((above_points, np.zeros_like(above_points[:,0]))), color='blue', point_size=8)
-pl.add_points(np.column_stack((xvals, y_vals, np.zeros_like(xvals))), color='green', point_size=8)
+pl.add_points(np.column_stack((xvals, y_vals, np.full_like(xvals, Z_VAL))), color='green', point_size=8)
 pl.add_lines(np.array(lines).reshape(-1, 3), color='black', width=2)
 pl.add_axes(interactive=True) # type: ignore
 

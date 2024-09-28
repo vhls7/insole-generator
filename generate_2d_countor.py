@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from sklearn.cluster import DBSCAN
 
 from functions.algebric_functions import calculate_angle
-
+from generate_raster import two_d_section
 
 def find_next_point(
         current_point: NDArray[floating],
@@ -62,13 +62,10 @@ def connect_points(points: NDArray[floating]) -> NDArray[floating]:
 
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'output_files\insole.stl'
+    Z_VAL = 1
     mesh = pv.read(INSOLE_FILE_PATH)
 
-    plane = pv.Plane(center=(0, 0, 1), direction=(0, 0, 1), i_size=300, j_size=300, i_resolution=100, j_resolution=100).triangulate() # type: ignore
-
-    intersection, _, _ = mesh.intersection(plane) # type: ignore
-
-    intersection_points = intersection.points
+    intersection_points = two_d_section(mesh, Z_VAL)
 
     points_2d = intersection_points[:, :2]
 
@@ -95,7 +92,7 @@ if __name__ == "__main__":
         for i, start in enumerate(contour):
             end = contour[i + 1 if i != len(contour)-1 else 0]
 
-            lines[i] = [[start[0], start[1], 0], [end[0], end[1], 0]]
+            lines[i] = [[start[0], start[1], Z_VAL], [end[0], end[1], Z_VAL]]
 
         pl.add_lines(np.array(lines).reshape(-1, 3), color='black', width=10)
 
