@@ -1,29 +1,17 @@
 import numpy as np
 import pyvista as pv
+from numpy import floating
 from numpy.typing import NDArray
 from sklearn.cluster import DBSCAN
 
-
-def calculate_angle(v1: NDArray[np.floating], v2: NDArray[np.floating]) -> float:
-    """Return the angle between two vectors in degrees [0, 180]"""
-    dot_product = np.dot(v1, v2)
-    norm_v1 = np.linalg.norm(v1)
-    norm_v2 = np.linalg.norm(v2)
-
-    cos_angle = dot_product / (norm_v1 * norm_v2)
-
-    # To prevent errors, the value is limited to between -1 and 1.
-    cos_angle = np.clip(cos_angle, -1, 1)
-
-    angle = float(np.degrees(np.arccos(cos_angle)))
-    return angle
+from functions.algebric_functions import calculate_angle
 
 
 def find_next_point(
-        current_point: NDArray[np.floating],
-        points: NDArray[np.floating],
-        previous_vector: NDArray[np.floating] | None
-    ) -> NDArray[np.floating] | None:
+        current_point: NDArray[floating],
+        points: NDArray[floating],
+        previous_vector: NDArray[floating] | None
+    ) -> NDArray[floating] | None:
     """
     Find the next point from a given set of points based on distance and angle constraints.
     It gets the closest point as the next if the angle between the previous vector and the current
@@ -50,7 +38,7 @@ def find_next_point(
 
     return None
 
-def connect_points(points: NDArray[np.floating]) -> NDArray[np.floating]:
+def connect_points(points: NDArray[floating]) -> NDArray[floating]:
     """
     Connects points in a sequence starting from the point with the minimum y-coordinate.
     The next point is determined by the closest point that satisfies the angle constraint.
@@ -109,6 +97,6 @@ if __name__ == "__main__":
 
             lines[i] = [[start[0], start[1], 0], [end[0], end[1], 0]]
 
-        pl.add_lines(np.array(lines).reshape(-1,3), color='black', width=10)
+        pl.add_lines(np.array(lines).reshape(-1, 3), color='black', width=10)
 
     pl.show()
