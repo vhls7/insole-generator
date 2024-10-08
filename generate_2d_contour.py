@@ -2,6 +2,7 @@ import numpy as np
 import pyvista as pv
 from numpy import floating
 from numpy.typing import NDArray
+from scipy.interpolate import CubicSpline
 from sklearn.cluster import DBSCAN
 
 from functions.algebric_functions import calculate_angle
@@ -18,6 +19,7 @@ class InsoleMeshProcessor:
         self.min_radius = min_radius
         self.mesh = pv.read(self.file_path)
         self.mesh_points = np.asarray(self.mesh.points)
+        self.spacing = 3
 
     def two_d_section(self, z_val: float) -> NDArray[floating]:
         """Generate a 2D intersection of the solid mesh at a specified z-plane."""
@@ -42,7 +44,7 @@ class InsoleMeshProcessor:
         distances = np.linalg.norm(points - current_point, axis=1)
         sorted_indices = np.argsort(distances)
 
-        for idx in sorted_indices:
+        for idx in sorted_indices[1:]:
             candidate_point = points[idx]
             candidate_vector = candidate_point - current_point
 
@@ -69,9 +71,7 @@ class InsoleMeshProcessor:
         ordered_points = [np.append(current_point, z_val)]
         previous_vector = None
 
-        while len(points) > 0:
-            distances = np.linalg.norm(points - current_point, axis=1)
-            points = points[distances > self.min_radius]
+        while len(ordered_points) < len(points):
 
             next_point = self.find_next_point(current_point, points, previous_vector)
             if next_point is None:
@@ -83,6 +83,7 @@ class InsoleMeshProcessor:
 
         return np.array(ordered_points)
 
+
     def get_contour_lines(self, ord_points: NDArray[floating]) -> NDArray[floating]:
         """Generate contour lines by connecting ordered points."""
         lines = np.zeros((len(ord_points), 2, 3))
@@ -90,6 +91,24 @@ class InsoleMeshProcessor:
             end = ord_points[i + 1 if i != len(ord_points)-1 else 0]
             lines[i] = [start, end]
         return lines
+
+    def spline_interpolation(self, points, spacing):
+
+        x, y, z = points[:, 0], points[:, 1], points[:, 2]
+        t = np.linspace(0, 1, len(points))
+
+        linear_distances = np.sqrt(np.sum(np.diff(points, axis=0)**2, axis=1)) # sqrt (Δx^2 + Δy^2)
+        cumulative_dist = np.sum(linear_distances)
+
+        cs_x = CubicSpline(t, x, bc_type='periodic')  # 'periodic' for closed contour
+        cs_y = CubicSpline(t, y, bc_type='periodic')
+
+        # Criar novos pontos interpolados
+        t_new = np.linspace(0, 1, int(cumulative_dist / spacing))
+        x_new = cs_x(t_new)
+        y_new = cs_y(t_new)
+        new_z = np.full_like(x_new, z[0])
+        return np.column_stack((x_new, y_new, new_z))
 
     def process_contours(self, z_val: float):
         """Process the contours using DBSCAN clustering to identify regions and their properties."""
@@ -101,10 +120,11 @@ class InsoleMeshProcessor:
         for cluster_idx, cluster in enumerate(np.unique(clusters[clusters != -1])):
             cluster_points = intersection_points_2d[clusters == cluster]
             ord_points = self.ordering_points(cluster_points, z_val)
-            contour_lines = self.get_contour_lines(ord_points)
-            is_raised = self.is_raised_area(ord_points)
+            equal_spaced_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
+            contour_lines = self.get_contour_lines(equal_spaced_points)
+            is_raised = self.is_raised_area(equal_spaced_points)
             contours_info[cluster_idx] = {
-                'ordered_points': ord_points,
+                'ordered_points': equal_spaced_points,
                 'is_raised': is_raised,
                 'contour_lines': contour_lines
             }
