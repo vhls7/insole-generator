@@ -1,8 +1,10 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import CubicSpline
-from generate_2d_contour import InsoleMeshProcessor
+import numpy as np
 import pyvista as pv
+from scipy.interpolate import CubicSpline
+
+from generate_2d_contour import InsoleMeshProcessor
+
 
 def spline_interpolation(points, spacing):
 
@@ -88,8 +90,6 @@ TOOL_RADIUS = TOOL_DIAMETER/2
 processor = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
 contours_information = processor.process_contours(Z_VAL)
 ordered_points = contours_information[0]['ordered_points']
-for cont_info in contours_information.values():
-    cont_info['spline_interp'] = spline_interpolation(cont_info['ordered_points'], spacing=3)
 
 # plt.plot(new_contour[:, 0], new_contour[:, 1], '-o', label='Contorno Interpolado')
 # plt.show()
@@ -113,7 +113,7 @@ for i in range(1, steps):
     p2 = np.asarray([max_x_point[0] + 1, y_pos])
     intersections = np.asarray([])
     for cont_info in contours_information.values():
-        cur_intersections = find_intersections_with_contour([p1, p2], cont_info['spline_interp'])
+        cur_intersections = find_intersections_with_contour([p1, p2], cont_info['ordered_points'][:,:2])
         if intersections.size:
             if cur_intersections.shape == (2, 2):
                 intersections = np.concatenate((intersections, cur_intersections))
