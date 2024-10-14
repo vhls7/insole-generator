@@ -65,6 +65,13 @@ class InsoleMeshProcessor:
         delta_z = closest_point[2] - contour_mean[2]
         return delta_z >= 0
 
+    @property
+    def get_triangles(self):
+        # based on https://github.com/pyvista/pyvista/discussions/1465
+        triangles_coord_idxs = self.mesh.faces.reshape((-1, 4))[:, 1:]
+        triangles = self.mesh_points[triangles_coord_idxs]
+        return triangles
+
     def ordering_points(self, points: NDArray[floating], z_val: float) -> NDArray[floating]:
         """Order points based on proximity, starting from the lowest y-coordinate."""
         current_point = points[np.argmin(points[:, 1])]
@@ -114,20 +121,20 @@ class InsoleMeshProcessor:
         """Process the contours using DBSCAN clustering to identify regions and their properties."""
         intersection_points = self.two_d_section(z_val)
         intersection_points_2d = intersection_points[:, :2]
-        clusters = DBSCAN(eps=5, min_samples=5).fit_predict(intersection_points_2d)
+        clusters = DBSCAN(eps=4, min_samples=5).fit_predict(intersection_points_2d)
 
-        contours_info = {}
-        for cluster_idx, cluster in enumerate(np.unique(clusters[clusters != -1])):
+        contours_info = {'clusters': [], 'intersection_points_2d': intersection_points_2d}
+        for cluster in np.unique(clusters[clusters != -1]):
             cluster_points = intersection_points_2d[clusters == cluster]
             ord_points = self.ordering_points(cluster_points, z_val)
             equal_spaced_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
             contour_lines = self.get_contour_lines(equal_spaced_points)
             is_raised = self.is_raised_area(equal_spaced_points)
-            contours_info[cluster_idx] = {
+            contours_info['clusters'].append({
                 'ordered_points': equal_spaced_points,
                 'is_raised': is_raised,
                 'contour_lines': contour_lines
-            }
+            })
         return contours_info
 
     def visualize(self, contours_info):

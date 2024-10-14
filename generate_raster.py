@@ -1,26 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from scipy.interpolate import CubicSpline
+import numpy as np
+
+from functions.algebric_functions import intersect_line_triangle
 from generate_2d_contour import InsoleMeshProcessor
-import pyvista as pv
 
-def spline_interpolation(points, spacing):
-
-    x, y = points[:, 0], points[:, 1]
-    t = np.linspace(0, 1, len(points))
-
-    linear_distances = np.sqrt(np.sum(np.diff(points, axis=0)**2, axis=1)) # sqrt (Δx^2 + Δy^2)
-    cumulative_dist = np.sum(linear_distances)
-
-    cs_x = CubicSpline(t, x, bc_type='periodic')  # 'periodic' for closed contour
-    cs_y = CubicSpline(t, y, bc_type='periodic')
-
-    # Criar novos pontos interpolados
-    t_new = np.linspace(0, 1, int(cumulative_dist / spacing))
-    x_new = cs_x(t_new)
-    y_new = cs_y(t_new)
-
-    return np.column_stack((x_new, y_new))
 
 def line_segment_intersection(p1, p2, a, b):
     """
@@ -78,58 +61,96 @@ def find_intersections_with_contour(segment, contour_points):
 
     return np.asarray(intersections)
 
+def get_all_x_intersections(x_min, x_max, y_val, clusters_information):
+    p1 = np.asarray([x_min, y_val])
+    p2 = np.asarray([x_max, y_val])
+    intersections = np.empty((0, 2))
+    for cluster_info in clusters_information:
+        cur_intersections = find_intersections_with_contour([p1, p2], cluster_info['ordered_points'][:, :2])
+        if cur_intersections.ndim == 2:
+            intersections = np.concatenate((intersections, cur_intersections))
+    intersections = intersections[np.argsort(intersections[:, 0])]
+    return intersections
 
-INSOLE_FILE_PATH = r'output_files\insole.stl'
-STEP_OVER = 3
+def has_surface_above_point(x, y, z, triangles, tolerance):
+    point1 = np.asarray([x, y, z])
+    point2 = np.asarray([x, y, z + 10])
+    filt_triangles = triangles[
+        np.any(np.abs(triangles[:, :, 0] - x) < tolerance, axis=1)
+        & np.any(np.abs(triangles[:, :, 1] - y) < tolerance, axis=1)
+    ]
+    return np.any([
+        intersect_line_triangle(point1, point2, np.array(a), np.array(b), np.array(c))
+        for a, b, c in filt_triangles
+    ])
+
+
+INSOLE_FILE_PATH = r'output_files\insole.STL'
 Z_VAL = 1
+# INSOLE_FILE_PATH = r'input_files\test_complex.STL'
+# Z_VAL = 16
+STEP_OVER = 3
+RASTER_STEP = 1
 MIN_RADIUS = 3
 TOOL_DIAMETER = 6
 TOOL_RADIUS = TOOL_DIAMETER/2
-processor = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
-contours_information = processor.process_contours(Z_VAL)
-ordered_points = contours_information[0]['ordered_points']
 
-new_contour = spline_interpolation(ordered_points, spacing=3)
-# plt.plot(new_contour[:, 0], new_contour[:, 1], '-o', label='Contorno Interpolado')
-# plt.show()
+insole_proc = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
+contours_information = insole_proc.process_contours(Z_VAL)
+clusters_information = contours_information['clusters']
+intersection_points_2d = contours_information['intersection_points_2d']
 
-
-min_y_point = ordered_points[np.argmin(ordered_points[:, 1])]
-max_y_point = ordered_points[np.argmax(ordered_points[:, 1])]
-min_x_point = ordered_points[np.argmin(ordered_points[:, 0])]
-max_x_point = ordered_points[np.argmax(ordered_points[:, 0])]
-steps = int((max_y_point[1] - min_y_point[1]) / STEP_OVER) + 1
-
-x_start, x_end, y_pos = None, None, None
-lines = []
-for i in range(1, steps):
-    last_y = y_pos
-    last_x_end = x_end
-
-    y_pos = min_y_point[1] + (i * STEP_OVER)
-    p1 = np.asarray([min_x_point[0] - 1, y_pos])
-    p2 = np.asarray([max_x_point[0] + 1, y_pos])
-
-    intersections = find_intersections_with_contour([p1, p2], new_contour)
-    if intersections.shape != (2, 2):
-        break
-    lower_x = np.min(intersections[:, 0])
-    upper_x = np.max(intersections[:, 0])
-
-    if (x_end is None) or (np.abs(x_end - lower_x) < np.abs(x_end - upper_x)):
-        x_start, x_end = lower_x, upper_x
-    else:
-        x_start, x_end = upper_x, lower_x
-
-    if i > 1:
-        lines.append([[last_x_end, last_y, Z_VAL], [x_start, y_pos, Z_VAL]])
-    lines.append([[x_start, y_pos, Z_VAL], [x_end, y_pos, Z_VAL]])
+triangles = insole_proc.get_triangles
+filtered_triangles = triangles[np.any(triangles[:, :, 2] > Z_VAL, axis=1)]
 
 
+min_y_point_coord = intersection_points_2d[np.argmin(intersection_points_2d[:, 1])]
+max_y_point_coord = intersection_points_2d[np.argmax(intersection_points_2d[:, 1])]
+min_x_point_coord = intersection_points_2d[np.argmin(intersection_points_2d[:, 0])]
+max_x_point_coord = intersection_points_2d[np.argmax(intersection_points_2d[:, 0])]
 
-pl = pv.Plotter()
-pl.add_mesh(pv.PolyData(ordered_points), color='red', point_size=3)
-pl.add_lines(np.array(lines).reshape(-1, 3), color='black', width=2)
-pl.add_axes(interactive=True) # type: ignore
+y_max = max_y_point_coord[1]
+y_min = min_y_point_coord[1]
+x_max = max_x_point_coord[0]
+x_min = min_x_point_coord[0]
 
-pl.show()
+x_grid_vals = np.arange(x_min - RASTER_STEP, x_max + RASTER_STEP*2, RASTER_STEP)
+y_grid_vals = np.arange(y_min, y_max + STEP_OVER, STEP_OVER)
+boolean_matrix = np.full((x_grid_vals.size, y_grid_vals.size), True)
+
+for y_index, y_val in enumerate(y_grid_vals):
+    intersections = get_all_x_intersections(x_min, x_max, y_val, clusters_information)
+
+    if len(intersections) == 0:
+        boolean_matrix[:, y_index] = False
+        continue
+
+    for i, (start, end) in enumerate(zip(intersections, intersections[1:])):
+        x_start, x_end = start[0], end[0]
+        if i == 0:
+            boolean_matrix[x_grid_vals <= x_start, y_index] = False
+        if i == len(intersections)-2: # If there is a single intersection, the unique iteration will reach both if statements.
+            boolean_matrix[x_grid_vals >= x_end, y_index] = False
+
+        x_points = x_grid_vals[((x_grid_vals >= x_start) & (x_grid_vals <= x_end))]
+        if not x_points.size:
+            continue
+        mid_x = x_points[x_points.size // 2]
+        if has_surface_above_point(mid_x, y_val, Z_VAL, filtered_triangles, STEP_OVER): # tolerance should be defined in function of mesh element size
+            boolean_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = False
+
+
+true_coords = [(x_grid_vals[x_idx], y_grid_vals[y_idx]) for y_idx in range(len(y_grid_vals)) for x_idx in range(len(x_grid_vals)) if boolean_matrix[x_idx, y_idx]]
+x_true, y_true = zip(*true_coords)
+
+plt.scatter(x_true, y_true, c='blue', marker='o', s=1, label='True Points')
+
+for cluster_info in clusters_information:
+    ordered_points = cluster_info['ordered_points']
+    plt.plot(ordered_points[:, 0], ordered_points[:, 1], 'ro-', markersize=3, label='Contour')
+
+plt.xlabel('X values')
+plt.ylabel('Y values')
+plt.title('Scatter Plot of True Points with Contours')
+plt.legend()
+plt.show()
