@@ -17,8 +17,38 @@ def calculate_angle(v1: NDArray[floating], v2: NDArray[floating]) -> float:
     angle = float(np.degrees(np.arccos(cos_angle)))
     return angle
 
+def lines_intersect_2d(p1, p2, a, b):
+    """
+    Check if the lines intersect and return the intersection point if they do; otherwise, return None.
 
-def lines_intersect(p1, p2, p3, p4):
+    p1 + t * (p2 - p1) = a + u * (b - a)
+    t * (p2 - p1) - u * (b - a) = a - p1
+    Using Cramer
+    [(p2 - p1)x - (b - a)x] * [t] = [(a - p1)x]
+    [(p2 - p1)y - (b - a)y] * [u] = [(a - p1)y]
+    t = Dt/D; u = Du/D
+    """
+    p1p2 = p2 - p1
+    ab = b - a
+
+    det = np.linalg.det([p1p2, ab])
+
+    vectors_are_parallel = np.isclose(det, 0)
+    if vectors_are_parallel:
+        return None
+
+    t = np.linalg.det([a - p1, ab]) / det
+    u = np.linalg.det([a - p1, p1p2]) / det
+
+    # Check if intersection is in line limits
+    if 0 <= t <= 1 and 0 <= u <= 1:
+        # Ponto de interseção
+        intersection = p1 + t * p1p2
+        return intersection
+
+    return None
+
+def lines_intersect_3d(p1, p2, p3, p4):
     # https://paulbourke.net/geometry/pointlineplane/
     # The shortest line between two lines in 3D
     # Let Pa = Point in P1P2 and Pb = Point in P3P4
@@ -59,23 +89,24 @@ def intersect_line_triangle(p1, p2, a, b, c):
     # Intersection of a plane and a line
 
     # Returns false if a line point is coincident with a vertex
-    if np.any([np.all(np.isclose(p1, p)) for p in [a, b, c]]) or np.any([np.all(np.isclose(p2, p)) for p in [a, b, c]]):
+    if np.any([np.allclose(p1, p) for p in [a, b, c]]) or np.any([np.allclose(p2, p) for p in [a, b, c]]):
         return False
     ab = b - a
     ac = c - a
     normal = np.cross(ab, ac)
 
     line = p2 - p1
+    dot_normal_line = np.dot(normal, line)
 
-    if np.abs(np.dot(normal, line)) < 1e-6:  # Line is parallel to the plane
-        intersec_with_ab = lines_intersect(p1, p2, a, b)
-        intersec_with_bc = lines_intersect(p1, p2, b, c)
-        intersec_with_ac = lines_intersect(p1, p2, a, c)
+    if np.abs(dot_normal_line) < 1e-6:  # Line is parallel to the plane
+        intersec_with_ab = lines_intersect_3d(p1, p2, a, b)
+        intersec_with_bc = lines_intersect_3d(p1, p2, b, c)
+        intersec_with_ac = lines_intersect_3d(p1, p2, a, c)
         return intersec_with_ab is True or intersec_with_bc is True or intersec_with_ac is True
 
-    u = np.dot(normal, a - p1) / np.dot(normal, line)
+    u = np.dot(normal, a - p1) / dot_normal_line
 
-    if u < 0 or u > 1: # The intersection is outside the line segment between P1 and P2
+    if not (0 <= u <= 1): # The intersection is outside the line segment between P1 and P2
         return False
 
     intersec_point = p1 + u * line
