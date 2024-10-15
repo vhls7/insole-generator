@@ -57,14 +57,6 @@ class InsoleMeshProcessor:
 
         return None
 
-    def is_raised_area(self, contour_points: NDArray[floating]) -> bool:
-        """Detect if an area is a boss (raised) or a recess (lowered) relative to contour."""
-        contour_mean = np.mean(contour_points, axis=0)
-        distances = np.linalg.norm(self.mesh_points - contour_mean, axis=1)
-        closest_point = self.mesh_points[np.argmin(distances)]
-        delta_z = closest_point[2] - contour_mean[2]
-        return delta_z >= 0
-
     @property
     def get_triangles(self):
         # based on https://github.com/pyvista/pyvista/discussions/1465
@@ -129,10 +121,8 @@ class InsoleMeshProcessor:
             ord_points = self.ordering_points(cluster_points, z_val)
             equal_spaced_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
             contour_lines = self.get_contour_lines(equal_spaced_points)
-            is_raised = self.is_raised_area(equal_spaced_points)
             contours_info['clusters'].append({
                 'ordered_points': equal_spaced_points,
-                'is_raised': is_raised,
                 'contour_lines': contour_lines
             })
         return contours_info
