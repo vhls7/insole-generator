@@ -131,7 +131,7 @@ class InsoleMeshProcessor:
         """Visualize the processed contours and mesh."""
         pl = pv.Plotter()
 
-        for contour_info in contours_info.values():
+        for contour_info in contours_info['clusters']:
             points = contour_info['ordered_points']
             lines = contour_info['contour_lines']
             pl.add_lines(np.array(lines).reshape(-1, 3), color='blue', width=5)
@@ -148,4 +148,3 @@ if __name__ == "__main__":
     processor = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
     contours_information = processor.process_contours(Z_VAL)
     processor.visualize(contours_information)
-    print(contours_information)
