@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.typing import NDArray
 from numpy import floating
+from numpy.typing import NDArray
+
 from functions.algebric_functions import intersect_line_triangle, lines_intersect_2d
 from generate_2d_contour import InsoleMeshProcessor
 
@@ -90,8 +91,82 @@ def generate_boolean_matrix(intersec_points_2d, clusters_info, filt_triangles, z
         else:
             update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections, z_val, y_val, filt_triangles, step_over)
 
-    return x_grid_vals, y_grid_vals, bool_matrix
+    return x_grid_vals, y_grid_vals, bool_matrix.T
 
+def segment_has_intersection(positions, start_x, cur_y, clusters_information):
+    if positions:
+        last_point = np.asarray(positions[-1])
+        cur_point = np.asarray([start_x, cur_y])
+        intersections = []
+        for cl_info in clusters_information:
+            cur_intersections = find_intersections_with_contour([last_point, cur_point], cl_info['ordered_points'][:, :2])
+            if cur_intersections.ndim == 2:
+                intersections.append(cur_intersections)
+        if intersections:
+            return True
+    return False
+
+def process_segment(x_idxs, direction, x_grid_values):
+    start_x_idx = x_idxs[0] if direction == 'right' else x_idxs[1]
+    end_x_idx = x_idxs[1] if direction == 'right' else x_idxs[0]
+    start_x = x_grid_values[start_x_idx]
+    end_x = x_grid_values[end_x_idx]
+    return start_x, end_x
+
+def is_last_row_with_segments(y_idx, segments_limits_per_row):
+    return y_idx + 1 == len(segments_limits_per_row) or len(segments_limits_per_row[y_idx + 1]) == 0
+
+def get_segments_limits_per_row(bool_matrix):
+    """
+    Given a boolean matrix, this function returns a list of segment limits
+    for each row where segments of True values are found.
+    """
+    segments_limits_per_row = []
+    for row in bool_matrix:
+        x_idxs = np.nonzero(row)[0]
+        if len(x_idxs) > 0:
+            segments = np.split(x_idxs, np.nonzero(np.diff(x_idxs) != 1)[0] + 1)
+            segment_limits = [(segment[0], segment[-1]) for segment in segments]
+            segments_limits_per_row.append(segment_limits)
+        else:
+            segments_limits_per_row.append([])
+
+    return segments_limits_per_row
+
+def generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, clusters_information):
+    paths = []
+    while (y_idx := next((i for i, segments in enumerate(segments_limits_per_row) if segments), None)):
+        positions = []
+        end_x = None
+        segment_idx = 0
+        direction = 'right'
+
+        while True:
+            x_segments = segments_limits_per_row[y_idx]
+
+            if end_x is not None:
+                segment_idx = np.argmin(np.abs(np.mean(x_segments, axis=1) - end_x))
+
+            start_x, end_x = process_segment(x_segments[segment_idx], direction, x_grid_values)
+            cur_y = y_grid_values[y_idx]
+
+            if segment_has_intersection(positions, start_x, cur_y, clusters_information):
+                break
+
+            positions.append([start_x, cur_y])
+            if start_x != end_x:
+                positions.append([end_x, cur_y])
+
+            del segments_limits_per_row[y_idx][segment_idx]
+
+            if is_last_row_with_segments(y_idx, segments_limits_per_row):
+                break
+
+            y_idx += 1
+            direction = 'right' if direction == 'left' else 'left'
+
+        paths.append(np.asarray(positions))
+    return paths
 
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'output_files\insole.STL'
@@ -111,20 +186,25 @@ if __name__ == "__main__":
     all_triangles = insole_proc.get_triangles
     filtered_triangles = all_triangles[np.any(all_triangles[:, :, 2] > Z_VAL, axis=1)]
 
-
-    # min_y_point_coord = intersection_points_2d[np.argmin(intersection_points_2d[:, 1])]
-
     x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(intersection_points_2d, clusters_information, filtered_triangles, Z_VAL, RASTER_STEP, STEP_OVER)
 
-    # Plotting the result
-    true_coords = np.asarray([(x_grid_values[x_idx], y_grid_values[y_idx]) for x_idx, y_idx in np.argwhere(boolean_matrix)])
+    segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
 
-    plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
+    paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, clusters_information)
 
+
+# region Plotting the result
+    true_coords = np.asarray([(x_grid_values[x_idx], y_grid_values[y_idx]) for y_idx, x_idx  in np.argwhere(boolean_matrix)])
+
+    # plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
+    colors = ['black', 'blue', 'green', 'orange', 'purple', 'gray']
+    for i, path in enumerate(paths):
+        plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {i}', color=colors[i % len(colors)])
     for cl_info in clusters_information:
         ordered_points = cl_info['ordered_points']
-        plt.plot(ordered_points[:, 0], ordered_points[:, 1], 'ro-', markersize=3, label='Contour')
+        plt.plot(ordered_points[:, 0], ordered_points[:, 1], 'ro-', markersize=3, label='Insole Contours')
 
     plt.gca().set(xlabel='X values', ylabel='Y values', title='Scatter Plot of True Points with Contours')
-    plt.legend()
+    plt.legend().set_draggable(True)
     plt.show()
+# endregion
