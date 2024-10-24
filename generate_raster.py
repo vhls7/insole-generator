@@ -3,7 +3,7 @@ import numpy as np
 from numpy import floating
 from numpy.typing import NDArray
 
-from functions.algebric_functions import intersect_line_triangle, lines_intersect_2d
+from functions.algebric_functions import lines_intersect_2d
 from generate_2d_contour import InsoleMeshProcessor
 
 
@@ -31,51 +31,6 @@ def find_intersections_with_contour(segment, contour_points):
 
     return np.asarray(intersections)
 
-def get_all_x_intersections(x_min, x_max, y_val, clusters_info):
-    p1 = np.asarray([x_min, y_val])
-    p2 = np.asarray([x_max, y_val])
-    intersections = np.empty((0, 2))
-    for cluster_info in clusters_info['clusters']:
-        is_external_contour = cluster_info['cluster_idx'] == clusters_info['external_contour_idx']
-        cluster_points = cluster_info['offset'][:, :2] if not is_external_contour else cluster_info['points'][:, :2]
-        cur_intersections = find_intersections_with_contour([p1, p2], cluster_points)
-        if cur_intersections.ndim == 2:
-            intersections = np.concatenate((intersections, cur_intersections))
-    intersections = intersections[np.argsort(intersections[:, 0])]
-    return intersections
-
-def has_surface_above_point(x, y, z, triangles, tolerance):
-    point1 = np.asarray([x, y, z])
-    point2 = np.asarray([x, y, z + 100])
-    filt_triangles = triangles[
-        np.any(np.abs(triangles[:, :, 0] - x) < tolerance, axis=1)
-        & np.any(np.abs(triangles[:, :, 1] - y) < tolerance, axis=1)
-    ]
-    return np.any([
-        intersect_line_triangle(point1, point2, np.array(a), np.array(b), np.array(c))
-        for a, b, c in filt_triangles
-    ])
-
-def has_surface_above_points(x_values, y, z, triangles, tolerance):
-    
-    for x in x_values:
-        point1 = np.asarray([x, y, z])
-        point2 = np.asarray([x, y, z + 100])
-        
-        filt_triangles = triangles[
-            np.any(np.abs(triangles[:, :, 0] - x) < tolerance, axis=1)
-            & np.any(np.abs(triangles[:, :, 1] - y) < tolerance, axis=1)
-        ]
-        
-        if np.any([
-            intersect_line_triangle(point1, point2, np.array(a), np.array(b), np.array(c))
-            for a, b, c in filt_triangles
-        ]):
-            return True
-
-    return False
-
-
 def generate_grid_values(intersec_points_2d: NDArray[floating], raster_step: float, step_over: float) -> tuple[NDArray[floating], NDArray[floating]]:
     """
     Generate X and Y grid values based on the given intersection points and step sizes.
@@ -88,30 +43,35 @@ def generate_grid_values(intersec_points_2d: NDArray[floating], raster_step: flo
 
     return x_vals, y_vals
 
-def update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections, z_val, y_val, filt_triangles, step_over):
-    for i, (start, end) in enumerate(zip(intersections, intersections[1:])):
+def update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections):
+    if len(intersections) % 2 != 0:
+        raise ValueError("Number of intersections is odd!")
+    for i in range(0, len(intersections), 2):
+        start = intersections[i]
+        end = intersections[i + 1]
+
         x_start, x_end = start[0], end[0]
+        bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
 
-        if i == 0:
-            bool_matrix[x_grid_vals <= x_start, y_index] = False
-        if i == len(intersections) - 2: # If there is a single intersection, the unique iteration will reach both if statements.
-            bool_matrix[x_grid_vals >= x_end, y_index] = False
-
-        x_vals_to_test = np.linspace(x_start, x_end, 5)
-        if has_surface_above_points(x_vals_to_test, y_val, z_val, filt_triangles, step_over):
-            bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = False
-
-def generate_boolean_matrix(intersec_points_2d, clusters_info, filt_triangles, z_val, raster_step, step_over):
+def generate_boolean_matrix(intersec_points_2d, clusters_info, raster_step, step_over):
     x_grid_vals, y_grid_vals = generate_grid_values(intersec_points_2d, raster_step, step_over)
-    bool_matrix = np.full((x_grid_vals.size, y_grid_vals.size), True)
+    bool_matrix = np.full((x_grid_vals.size, y_grid_vals.size), False)
 
     for y_index, y_val in enumerate(y_grid_vals):
-        intersections = get_all_x_intersections(np.min(x_grid_vals), np.max(x_grid_vals), y_val, clusters_info)
+        intersections = np.empty((0, 2))
 
-        if len(intersections) == 0:
-            bool_matrix[:, y_index] = False
-        else:
-            update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections, z_val, y_val, filt_triangles, step_over)
+        for cluster_info in clusters_info['clusters']:
+            if cluster_info['is_raised_area'] is False:
+                cluster_points = cluster_info['offset'][:, :2]
+                p1 = np.asarray([np.min(x_grid_vals), y_val])
+                p2 = np.asarray([np.max(x_grid_vals), y_val])
+                cur_intersections = find_intersections_with_contour([p1, p2], cluster_points)
+                if cur_intersections.ndim == 2:
+                    intersections = np.concatenate((intersections, cur_intersections))
+        intersections = intersections[np.argsort(intersections[:, 0])]
+
+        if len(intersections) > 0:
+            update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections)
 
     return x_grid_vals, y_grid_vals, bool_matrix.T
 
@@ -207,10 +167,7 @@ if __name__ == "__main__":
     clusters_information = contours_information['clusters']
     intersection_points_2d = contours_information['intersection_points_2d']
 
-    all_triangles = insole_proc.get_triangles
-    filtered_triangles = all_triangles[np.any(all_triangles[:, :, 2] > Z_VAL, axis=1)]
-
-    x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(intersection_points_2d, contours_information, filtered_triangles, Z_VAL, RASTER_STEP, STEP_OVER)
+    x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(intersection_points_2d, contours_information, RASTER_STEP, STEP_OVER)
 
     segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
 
@@ -222,12 +179,12 @@ if __name__ == "__main__":
 
     # plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
     colors = ['black', 'blue', 'green', 'orange', 'purple', 'gray']
-    for i, path in enumerate(paths):
-        plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {i}', color=colors[i % len(colors)])
+    for idx, path in enumerate(paths):
+        plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {idx}', color=colors[idx % len(colors)])
     for cl_info in clusters_information:
         points = cl_info['points']
         plt.plot(points[:, 0], points[:, 1], 'ro-', markersize=3, label='Insole Contours')
-        plt.plot(cl_info['offset'][:, 0], cl_info['offset'][:, 1], 'o-', markersize=3, label='Insole Contours')
+        plt.plot(cl_info['offset'][:, 0], cl_info['offset'][:, 1], 'o-', markersize=3, label='Offset Contours')
 
     plt.gca().set(xlabel='X values', ylabel='Y values', title='Scatter Plot of True Points with Contours')
     plt.legend().set_draggable(True)

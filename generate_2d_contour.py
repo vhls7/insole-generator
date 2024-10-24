@@ -132,17 +132,27 @@ class InsoleMeshProcessor:
             'external_contour_idx': external_contour_idx
         }
         for cluster_idx in np.unique(clusters[clusters != -1]):
+            is_external_contour = cluster_idx == external_contour_idx
             cluster_points = intersection_points_2d[clusters == cluster_idx]
             ord_points = self.ordering_points(cluster_points, z_val)
             interp_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
-            offset_distance = -1 * self.tool_radius if cluster_idx != external_contour_idx else self.tool_radius
+            offset_distance = -1 * self.tool_radius if not is_external_contour else self.tool_radius
             contours_info['clusters'].append({
                 'points': interp_points,
                 'contour_lines': self.get_contour_lines(interp_points),
+                'is_raised_area': self.is_raised_area(interp_points) if not is_external_contour else None,
                 'offset': self.offset_contour(interp_points, offset_distance),
                 'cluster_idx': cluster_idx,
             })
         return contours_info
+
+    def is_raised_area(self, contour_points: NDArray[floating]) -> bool:
+        """Detect if an area is a boss (raised) or a recess (lowered) relative to contour."""
+        contour_mean = np.mean(contour_points, axis=0)
+        distances = np.linalg.norm(self.mesh_points - contour_mean, axis=1)
+        closest_point = self.mesh_points[np.argmin(distances)]
+        delta_z = closest_point[2] - contour_mean[2]
+        return bool(delta_z >= 0)
 
     def visualize(self, contours_info):
         """Visualize the processed contours and mesh."""
