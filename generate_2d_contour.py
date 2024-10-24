@@ -103,6 +103,7 @@ class InsoleMeshProcessor:
         cs_x = CubicSpline(norm_cumulative_dist, x, bc_type='periodic')  # 'periodic' for closed contour
         cs_y = CubicSpline(norm_cumulative_dist, y, bc_type='periodic')
 
+        # Criar novos pontos interpolados
         t_new = np.linspace(0, 1, int(cumulative_dist[-1] / spacing))
         x_new = cs_x(t_new)
         y_new = cs_y(t_new)
