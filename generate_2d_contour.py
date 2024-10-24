@@ -95,16 +95,16 @@ class InsoleMeshProcessor:
     def spline_interpolation(self, points, spacing):
 
         x, y, z = points[:, 0], points[:, 1], points[:, 2]
-        t = np.linspace(0, 1, len(points))
 
         linear_distances = np.sqrt(np.sum(np.diff(points, axis=0)**2, axis=1)) # sqrt (Δx^2 + Δy^2)
-        cumulative_dist = np.sum(linear_distances)
+        cumulative_dist = np.concatenate(([0], np.cumsum(linear_distances)))
+        norm_cumulative_dist = cumulative_dist / cumulative_dist[-1]
 
-        cs_x = CubicSpline(t, x, bc_type='periodic')  # 'periodic' for closed contour
-        cs_y = CubicSpline(t, y, bc_type='periodic')
+        cs_x = CubicSpline(norm_cumulative_dist, x, bc_type='periodic')  # 'periodic' for closed contour
+        cs_y = CubicSpline(norm_cumulative_dist, y, bc_type='periodic')
 
         # Criar novos pontos interpolados
-        t_new = np.linspace(0, 1, int(cumulative_dist / spacing))
+        t_new = np.linspace(0, 1, int(cumulative_dist[-1] / spacing))
         x_new = cs_x(t_new)
         y_new = cs_y(t_new)
         new_z = np.full_like(x_new, z[0])
