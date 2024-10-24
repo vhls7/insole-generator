@@ -3,6 +3,7 @@ import pyvista as pv
 from numpy import floating
 from numpy.typing import NDArray
 from scipy.interpolate import CubicSpline
+from shapely.geometry import Polygon
 from sklearn.cluster import DBSCAN
 
 from functions.algebric_functions import calculate_angle
@@ -14,9 +15,9 @@ class InsoleMeshProcessor:
 
     This class provides methods to generate 2D sections of the mesh, order points based on proximity, 
     detect raised or recessed areas, and visualize the contours."""
-    def __init__(self, file_path: str, min_radius: float):
+    def __init__(self, file_path: str, tool_radius: float):
         self.file_path = file_path
-        self.min_radius = min_radius
+        self.tool_radius = tool_radius
         self.mesh = pv.read(self.file_path)
         self.mesh_points = np.asarray(self.mesh.points)
         self.spacing = 3
@@ -109,21 +110,37 @@ class InsoleMeshProcessor:
         new_z = np.full_like(x_new, z[0])
         return np.column_stack((x_new, y_new, new_z))
 
+    def get_external_contour_idx(self, points, clusters):
+        cluster_sizes = []
+        for cluster_idx in np.unique(clusters[clusters != -1]):
+            contour_points = points[clusters == cluster_idx]
+            min_coords = np.min(contour_points, axis=0)
+            max_coords = np.max(contour_points, axis=0)
+            delta_coords = max_coords - min_coords
+            cluster_sizes.append(np.sum(delta_coords))
+        return np.argmax(cluster_sizes)
+
     def process_contours(self, z_val: float):
         """Process the contours using DBSCAN clustering to identify regions and their properties."""
         intersection_points = self.two_d_section(z_val)
         intersection_points_2d = intersection_points[:, :2]
         clusters = DBSCAN(eps=4, min_samples=5).fit_predict(intersection_points_2d)
-
-        contours_info = {'clusters': [], 'intersection_points_2d': intersection_points_2d}
-        for cluster in np.unique(clusters[clusters != -1]):
-            cluster_points = intersection_points_2d[clusters == cluster]
+        external_contour_idx = self.get_external_contour_idx(intersection_points_2d, clusters)
+        contours_info = {
+            'clusters': [],
+            'intersection_points_2d': intersection_points_2d,
+            'external_contour_idx': external_contour_idx
+        }
+        for cluster_idx in np.unique(clusters[clusters != -1]):
+            cluster_points = intersection_points_2d[clusters == cluster_idx]
             ord_points = self.ordering_points(cluster_points, z_val)
-            equal_spaced_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
-            contour_lines = self.get_contour_lines(equal_spaced_points)
+            interp_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
+            offset_distance = -1 * self.tool_radius if cluster_idx != external_contour_idx else self.tool_radius
             contours_info['clusters'].append({
-                'ordered_points': equal_spaced_points,
-                'contour_lines': contour_lines
+                'points': interp_points,
+                'contour_lines': self.get_contour_lines(interp_points),
+                'offset': self.offset_contour(interp_points, offset_distance),
+                'cluster_idx': cluster_idx,
             })
         return contours_info
 
@@ -132,19 +149,34 @@ class InsoleMeshProcessor:
         pl = pv.Plotter()
 
         for contour_info in contours_info['clusters']:
-            points = contour_info['ordered_points']
+            points = contour_info['points']
+            off_points = contour_info['offset']
             lines = contour_info['contour_lines']
-            pl.add_lines(np.array(lines).reshape(-1, 3), color='blue', width=5)
+            # pl.add_lines(np.array(lines).reshape(-1, 3), color='blue', width=5)
             pl.add_mesh(pv.PolyData(points), color='black', point_size=8)
+            pl.add_mesh(pv.PolyData(off_points), color='blue', point_size=8)
+            # pl.add_lines(np.array(self.get_contour_lines(off_points)).reshape(-1, 3), color='blue', width=5)
 
         pl.show()
+
+    def offset_contour(self, points, offset_distance):
+        z_val = points[0, 2]
+        polygon = Polygon(points[:, :2])
+
+        offset_polygon = polygon.buffer(offset_distance)
+        offset_coords = np.array(offset_polygon.exterior.coords)
+
+        z = np.full(len(offset_coords), z_val)
+        offset_points = np.column_stack((offset_coords, z))
+        equal_spaced_points = self.spline_interpolation(offset_points, self.spacing)
+        return equal_spaced_points
 
 
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'output_files\insole.stl'
     Z_VAL = 1
-    MIN_RADIUS = 3
+    TOOL_RADIUS = 3
 
-    processor = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
+    processor = InsoleMeshProcessor(INSOLE_FILE_PATH, TOOL_RADIUS)
     contours_information = processor.process_contours(Z_VAL)
     processor.visualize(contours_information)
