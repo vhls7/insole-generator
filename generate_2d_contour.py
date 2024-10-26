@@ -136,11 +136,12 @@ class InsoleMeshProcessor:
             cluster_points = intersection_points_2d[clusters == cluster_idx]
             ord_points = self.ordering_points(cluster_points, z_val)
             interp_points = self.spline_interpolation(np.append(ord_points, [ord_points[0]], axis=0), self.spacing)
-            offset_distance = -1 * self.tool_radius if not is_external_contour else self.tool_radius
+            is_raised = self.is_raised_area(interp_points)
+            offset_distance = -1 * self.tool_radius if is_raised is False else self.tool_radius
             contours_info['clusters'].append({
                 'points': interp_points,
                 'contour_lines': self.get_contour_lines(interp_points),
-                'is_raised_area': self.is_raised_area(interp_points) if not is_external_contour else None,
+                'is_raised_area': is_raised if not is_external_contour else None,
                 'offset': self.offset_contour(interp_points, offset_distance),
                 'cluster_idx': cluster_idx,
             })
@@ -183,8 +184,8 @@ class InsoleMeshProcessor:
 
 
 if __name__ == "__main__":
-    INSOLE_FILE_PATH = r'output_files\insole.stl'
-    Z_VAL = 1
+    INSOLE_FILE_PATH = r'input_files\test_complex2.STL'
+    Z_VAL = 16
     TOOL_RADIUS = 3
 
     processor = InsoleMeshProcessor(INSOLE_FILE_PATH, TOOL_RADIUS)
