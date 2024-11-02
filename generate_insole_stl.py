@@ -104,7 +104,8 @@ if __name__ == "__main__":
     scan_foot = process_stl(SCANNED_FILE_PATH, angle_x=-90, angle_y=-268, angle_z=180, axis='z', cut_value=15)
     parametric_insole = process_stl(PARAMETRIC_INSOLE_FILE_PATH, angle_z=270)
 
-    scan_foot.translate([0, 0, 6], inplace=True) # 13
+    scan_foot.translate([0, 0, 9], inplace=True) # 13
+    parametric_insole.translate([0, 0, 3], inplace=True) # 13
     scan_foot_coord_filt = esphere_filt(scan_foot.points, 3)
 
     # Remaking surface

@@ -53,7 +53,9 @@ def update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, i
         x_start, x_end = start[0], end[0]
         bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
 
-def generate_boolean_matrix(intersec_points_2d, clusters_info, raster_step, step_over):
+def generate_boolean_matrix(clusters_info, raster_step, step_over):
+    intersec_points_2d = clusters_info['intersection_points_2d']
+    only_external_contour = len(clusters_info['clusters']) == 1
     x_grid_vals, y_grid_vals = generate_grid_values(intersec_points_2d, raster_step, step_over)
     bool_matrix = np.full((x_grid_vals.size, y_grid_vals.size), False)
 
@@ -61,8 +63,8 @@ def generate_boolean_matrix(intersec_points_2d, clusters_info, raster_step, step
         intersections = np.empty((0, 2))
 
         for cluster_info in clusters_info['clusters']:
-            if cluster_info['is_raised_area'] is False:
-                cluster_points = cluster_info['offset'][:, :2]
+            if cluster_info['is_raised_area'] is False or only_external_contour:
+                cluster_points = cluster_info['offset'][:, :2] if not only_external_contour else cluster_info['points'][:, :2]
                 p1 = np.asarray([np.min(x_grid_vals), y_val])
                 p2 = np.asarray([np.max(x_grid_vals), y_val])
                 cur_intersections = find_intersections_with_contour([p1, p2], cluster_points)
@@ -152,10 +154,18 @@ def generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, cluste
         paths.append(np.asarray(positions))
     return paths
 
+def get_paths(contours_information, raster_step, step_over):
+    x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(contours_information, raster_step, step_over)
+
+    segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
+
+    paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, contours_information)
+    return paths
+
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'output_files\insole.STL'
-    Z_VAL = 1
-    # INSOLE_FILE_PATH = r'input_files\test_complex.STL'
+    Z_VAL = 4
+    # INSOLE_FILE_PATH = r'input_files\test_complex2.STL'
     # Z_VAL = 16
     STEP_OVER = 3
     RASTER_STEP = 1
@@ -163,30 +173,105 @@ if __name__ == "__main__":
 
 
     insole_proc = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
-    contours_information = insole_proc.process_contours(Z_VAL)
-    clusters_information = contours_information['clusters']
-    intersection_points_2d = contours_information['intersection_points_2d']
+    # contours_information = insole_proc.process_contours(Z_VAL)
 
-    x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(intersection_points_2d, contours_information, RASTER_STEP, STEP_OVER)
+    # x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(contours_information, RASTER_STEP, STEP_OVER)
 
-    segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
+    # segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
 
-    paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, contours_information)
+    # paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, contours_information)
 
 
-# region Plotting the result
-    true_coords = np.asarray([(x_grid_values[x_idx], y_grid_values[y_idx]) for y_idx, x_idx  in np.argwhere(boolean_matrix)])
+# # region Plotting the result
+#     true_coords = np.asarray([(x_grid_values[x_idx], y_grid_values[y_idx]) for y_idx, x_idx  in np.argwhere(boolean_matrix)])
 
-    # plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
-    colors = ['black', 'blue', 'green', 'orange', 'purple', 'gray']
-    for idx, path in enumerate(paths):
-        plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {idx}', color=colors[idx % len(colors)])
-    for cl_info in clusters_information:
-        points = cl_info['points']
-        plt.plot(points[:, 0], points[:, 1], 'ro-', markersize=3, label='Insole Contours')
-        plt.plot(cl_info['offset'][:, 0], cl_info['offset'][:, 1], 'o-', markersize=3, label='Offset Contours')
+#     # plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
+#     colors = ['black', 'blue', 'green', 'orange', 'purple', 'gray']
+#     for idx, path in enumerate(paths):
+#         plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {idx}', color=colors[idx % len(colors)])
+#     for cl_info in contours_information['clusters']:
+#         points = cl_info['points']
+#         plt.plot(points[:, 0], points[:, 1], 'ro-', markersize=3, label='Insole Contours')
+#         plt.plot(cl_info['offset'][:, 0], cl_info['offset'][:, 1], 'o-', markersize=3, label='Offset Contours')
 
-    plt.gca().set(xlabel='X values', ylabel='Y values', title='Scatter Plot of True Points with Contours')
-    plt.legend().set_draggable(True)
-    plt.show()
-# endregion
+#     plt.gca().set(xlabel='X values', ylabel='Y values', title='Scatter Plot of True Points with Contours')
+#     plt.legend().set_draggable(True)
+#     plt.show()
+# # endregion
+
+
+    def get_min_z(insole_obj):
+        all_triangles = insole_obj.get_triangles
+        all_normals = insole_obj.mesh.face_normals
+
+        horizontal_triang_idxs = np.nonzero(all_normals[:, 2] > 1e-3)[0]
+
+        filt_triangles = all_triangles[horizontal_triang_idxs]
+
+        min_z = np.min(filt_triangles[:, :, 2])
+        max_z = np.max(filt_triangles[:, :, 2])
+        return min_z, max_z
+
+    def generate_gcode_from_paths(levels, safe_z=36):
+        rotation_speed = 15000
+        gcode = [
+            'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
+            "G21            ; Set units to millimeters",
+            'G49            ; Cancel any tool offset that might be active',
+            f"G0 Z{safe_z}         ; Move to safe height",
+            f"M3 S{rotation_speed}      ; Start spindle rotation clockwise (M3) at {rotation_speed} RPM"
+        ]
+
+        for level in levels:
+            z = level['z']
+            paths = level['paths']
+            
+            for path in paths:
+
+                x_start, y_start = path[0]
+                gcode.append(f"G0 X{x_start:.3f} Y{y_start:.3f}        ; Rapid positioning to start of path")
+
+                gcode.append(f"G1 Z{z:.3f}        ; Set depth to {z:.3f}")
+
+                if len(path > 1):
+                    for x, y in path[1:]:
+                        gcode.append(f"G1 X{x:.3f} Y{y:.3f}        ; Linear move")
+
+                gcode.append(f"G0 Z{safe_z}         ; Move to safe height",)
+
+        gcode.append("M30 ; Program end")
+
+        return "\n".join(gcode)
+
+
+    # Dimension = 140 x 350 x 34
+    BLOCK_HEIGHT = 34
+    BLOCK_WIDTH = 140
+    BLOCK_LENGTH = 350
+
+    Z_STEP = 6
+    Z_STEP_FINISH = 1
+
+    min_z, max_z = get_min_z(insole_proc)
+    min_z += Z_STEP_FINISH
+
+    delta_z = BLOCK_HEIGHT - min_z
+    real_z_step = delta_z / Z_STEP
+
+    z_levels = np.arange(BLOCK_HEIGHT - real_z_step, min_z - real_z_step, -real_z_step)
+
+    bondary_info = insole_proc.process_contours(0.1)
+    bondary_paths = get_paths(bondary_info, RASTER_STEP, STEP_OVER)
+
+    response = []
+    for z in z_levels:
+        current = {'z': z}
+        if z > max_z:
+            paths = bondary_paths
+        else:
+            contour_info = insole_proc.process_contours(z)
+            paths = get_paths(contour_info, RASTER_STEP, STEP_OVER)
+        current['paths'] = paths
+        response.append(current)
+    g_code = generate_gcode_from_paths(response, 36)
+    print(g_code)
