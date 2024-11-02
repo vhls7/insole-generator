@@ -6,161 +6,173 @@ from numpy.typing import NDArray
 from functions.algebric_functions import lines_intersect_2d
 from generate_2d_contour import InsoleMeshProcessor
 
+class RoughingGCodeGenerator:
+    def __init__(self, contours_info, raster_step, step_over):
+        self.contours_info = contours_info
+        self.raster_step = raster_step
+        self.step_over = step_over
 
-def find_intersections_with_contour(segment, contour_points):
-    """
-    Finds intersections between a line segment and the contour defined by 'contour_points'.
-    
-    segment: [(x1, y1), (x2, y2)] - The endpoints of the line segment.
-    contour_points: List of points (N x 2) defining the closed contour, where N is the number of points 
-                    and each point is represented as a tuple (x, y).
-    
-    Returns a list of intersection points.
-    """
-    intersections = []
+        self.x_grid_vals, self.y_grid_vals, self.bool_matrix = self._generate_boolean_matrix()
 
-    p1, p2 = segment
+        self.segments_limits_per_row = RoughingGCodeGenerator.get_segments_limits_per_row(self.bool_matrix)
 
-    for i in range(len(contour_points) - 1):
-        a = contour_points[i]
-        b = contour_points[i + 1]
+        self.paths = self._generate_paths(self.segments_limits_per_row, self.x_grid_vals, self.y_grid_vals)
 
-        intersection = lines_intersect_2d(p1, p2, a, b)
-        if intersection is not None:
-            intersections.append(intersection)
-
-    return np.asarray(intersections)
-
-def generate_grid_values(intersec_points_2d: NDArray[floating], raster_step: float, step_over: float) -> tuple[NDArray[floating], NDArray[floating]]:
-    """
-    Generate X and Y grid values based on the given intersection points and step sizes.
-    """
-    x_max, y_max = np.max(intersec_points_2d, axis=0)
-    x_min, y_min = np.min(intersec_points_2d, axis=0)
-
-    x_vals = np.arange(x_min - raster_step, x_max + raster_step * 2, raster_step)
-    y_vals = np.arange(y_min, y_max + step_over, step_over)
-
-    return x_vals, y_vals
-
-def update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections):
-    if len(intersections) % 2 != 0:
-        raise ValueError("Number of intersections is odd!")
-    for i in range(0, len(intersections), 2):
-        start = intersections[i]
-        end = intersections[i + 1]
-
-        x_start, x_end = start[0], end[0]
-        bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
-
-def generate_boolean_matrix(clusters_info, raster_step, step_over):
-    intersec_points_2d = clusters_info['intersection_points_2d']
-    only_external_contour = len(clusters_info['clusters']) == 1
-    x_grid_vals, y_grid_vals = generate_grid_values(intersec_points_2d, raster_step, step_over)
-    bool_matrix = np.full((x_grid_vals.size, y_grid_vals.size), False)
-
-    for y_index, y_val in enumerate(y_grid_vals):
-        intersections = np.empty((0, 2))
-
-        for cluster_info in clusters_info['clusters']:
-            if cluster_info['is_raised_area'] is False or only_external_contour:
-                cluster_points = cluster_info['offset'][:, :2] if not only_external_contour else cluster_info['points'][:, :2]
-                p1 = np.asarray([np.min(x_grid_vals), y_val])
-                p2 = np.asarray([np.max(x_grid_vals), y_val])
-                cur_intersections = find_intersections_with_contour([p1, p2], cluster_points)
-                if cur_intersections.ndim == 2:
-                    intersections = np.concatenate((intersections, cur_intersections))
-        intersections = intersections[np.argsort(intersections[:, 0])]
-
-        if len(intersections) > 0:
-            update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections)
-
-    return x_grid_vals, y_grid_vals, bool_matrix.T
-
-def segment_has_intersection(positions, start_x, cur_y, clusters_information):
-    if positions:
-        last_point = np.asarray(positions[-1])
-        cur_point = np.asarray([start_x, cur_y])
+    @staticmethod
+    def find_intersections_with_contour(segment, contour_points):
+        """
+        Finds intersections between a line segment and the contour defined by 'contour_points'.
+        
+        segment: [(x1, y1), (x2, y2)] - The endpoints of the line segment.
+        contour_points: List of points (N x 2) defining the closed contour, where N is the number of points 
+                        and each point is represented as a tuple (x, y).
+        
+        Returns a list of intersection points.
+        """
         intersections = []
-        for cl_info in clusters_information['clusters']:
-            is_external_contour = cl_info['cluster_idx'] == clusters_information['external_contour_idx']
-            points = cl_info['offset'] if not is_external_contour else cl_info['points']
-            cur_intersections = find_intersections_with_contour([last_point, cur_point], points[:, :2])
-            if cur_intersections.ndim == 2:
-                intersections.append(cur_intersections)
-        if intersections:
-            return True
-    return False
 
-def process_segment(x_idxs, direction, x_grid_values):
-    start_x_idx = x_idxs[0] if direction == 'right' else x_idxs[1]
-    end_x_idx = x_idxs[1] if direction == 'right' else x_idxs[0]
-    start_x = x_grid_values[start_x_idx]
-    end_x = x_grid_values[end_x_idx]
-    return start_x, end_x
+        p1, p2 = segment
 
-def is_last_row_with_segments(y_idx, segments_limits_per_row):
-    return y_idx + 1 == len(segments_limits_per_row) or len(segments_limits_per_row[y_idx + 1]) == 0
+        for i in range(len(contour_points) - 1):
+            a = contour_points[i]
+            b = contour_points[i + 1]
 
-def get_segments_limits_per_row(bool_matrix):
-    """
-    Given a boolean matrix, this function returns a list of segment limits
-    for each row where segments of True values are found.
-    """
-    segments_limits_per_row = []
-    for row in bool_matrix:
-        x_idxs = np.nonzero(row)[0]
-        if len(x_idxs) > 0:
-            segments = np.split(x_idxs, np.nonzero(np.diff(x_idxs) != 1)[0] + 1)
-            segment_limits = [(segment[0], segment[-1]) for segment in segments]
-            segments_limits_per_row.append(segment_limits)
-        else:
-            segments_limits_per_row.append([])
+            intersection = lines_intersect_2d(p1, p2, a, b)
+            if intersection is not None:
+                intersections.append(intersection)
 
-    return segments_limits_per_row
+        return np.asarray(intersections)
 
-def generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, clusters_information):
-    paths = []
-    while (y_idx := next((i for i, segments in enumerate(segments_limits_per_row) if segments), None)):
-        positions = []
-        end_x = None
-        segment_idx = 0
-        direction = 'right'
+    def _generate_grid_values(self, intersec_points_2d: NDArray[floating]) -> tuple[NDArray[floating], NDArray[floating]]:
+        """
+        Generate X and Y grid values based on the given intersection points and step sizes.
+        """
+        x_max, y_max = np.max(intersec_points_2d, axis=0)
+        x_min, y_min = np.min(intersec_points_2d, axis=0)
 
-        while True:
-            x_segments = segments_limits_per_row[y_idx]
+        x_vals = np.arange(x_min - self.raster_step, x_max + self.raster_step * 2, self.raster_step)
+        y_vals = np.arange(y_min, y_max + self.step_over, self.step_over)
 
-            if end_x is not None:
-                segment_idx = np.argmin(np.abs(np.mean(x_segments, axis=1) - end_x))
+        return x_vals, y_vals
 
-            start_x, end_x = process_segment(x_segments[segment_idx], direction, x_grid_values)
-            cur_y = y_grid_values[y_idx]
+    @staticmethod
+    def _update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections):
+        if len(intersections) % 2 != 0:
+            raise ValueError("Number of intersections is odd!")
+        for i in range(0, len(intersections), 2):
+            start = intersections[i]
+            end = intersections[i + 1]
 
-            if segment_has_intersection(positions, start_x, cur_y, clusters_information):
-                break
+            x_start, x_end = start[0], end[0]
+            bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
 
-            positions.append([start_x, cur_y])
-            if start_x != end_x:
-                positions.append([end_x, cur_y])
+    def _generate_boolean_matrix(self):
+        intersec_points_2d = self.contours_info['intersection_points_2d']
+        only_external_contour = len(self.contours_info['clusters']) == 1
+        x_grid_vals, y_grid_vals = self._generate_grid_values(intersec_points_2d)
+        bool_matrix = np.full((x_grid_vals.size, y_grid_vals.size), False)
 
-            del segments_limits_per_row[y_idx][segment_idx]
+        for y_index, y_val in enumerate(y_grid_vals):
+            intersections = np.empty((0, 2))
 
-            if is_last_row_with_segments(y_idx, segments_limits_per_row):
-                break
+            for cluster_info in self.contours_info['clusters']:
+                if cluster_info['is_raised_area'] is False or only_external_contour:
+                    cluster_points = cluster_info['offset'][:, :2] if not only_external_contour else cluster_info['points'][:, :2]
+                    p1 = np.asarray([np.min(x_grid_vals), y_val])
+                    p2 = np.asarray([np.max(x_grid_vals), y_val])
+                    cur_intersections = self.find_intersections_with_contour([p1, p2], cluster_points)
+                    if cur_intersections.ndim == 2:
+                        intersections = np.concatenate((intersections, cur_intersections))
+            intersections = intersections[np.argsort(intersections[:, 0])]
 
-            y_idx += 1
-            direction = 'right' if direction == 'left' else 'left'
+            if len(intersections) > 0:
+                self._update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections)
 
-        paths.append(np.asarray(positions))
-    return paths
+        return x_grid_vals, y_grid_vals, bool_matrix.T
 
-def get_paths(contours_information, raster_step, step_over):
-    x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(contours_information, raster_step, step_over)
+    def segment_has_intersection(self, positions, start_x, cur_y):
+        if positions:
+            last_point = np.asarray(positions[-1])
+            cur_point = np.asarray([start_x, cur_y])
+            intersections = []
+            for cl_info in self.contours_info['clusters']:
+                is_external_contour = cl_info['cluster_idx'] == self.contours_info['external_contour_idx']
+                points = cl_info['offset'] if not is_external_contour else cl_info['points']
+                cur_intersections = self.find_intersections_with_contour([last_point, cur_point], points[:, :2])
+                if cur_intersections.ndim == 2:
+                    intersections.append(cur_intersections)
+            if intersections:
+                return True
+        return False
 
-    segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
+    @staticmethod
+    def process_segment(x_idxs, direction, x_grid_values):
+        start_x_idx = x_idxs[0] if direction == 'right' else x_idxs[1]
+        end_x_idx = x_idxs[1] if direction == 'right' else x_idxs[0]
+        start_x = x_grid_values[start_x_idx]
+        end_x = x_grid_values[end_x_idx]
+        return start_x, end_x
 
-    paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, contours_information)
-    return paths
+    @staticmethod
+    def is_last_row_with_segments(y_idx, segments_limits_per_row):
+        return y_idx + 1 == len(segments_limits_per_row) or len(segments_limits_per_row[y_idx + 1]) == 0
+
+    @staticmethod
+    def get_segments_limits_per_row(bool_matrix):
+        """
+        Given a boolean matrix, this function returns a list of segment limits
+        for each row where segments of True values are found.
+        """
+        segments_limits_per_row = []
+        for row in bool_matrix:
+            x_idxs = np.nonzero(row)[0]
+            if len(x_idxs) > 0:
+                segments = np.split(x_idxs, np.nonzero(np.diff(x_idxs) != 1)[0] + 1)
+                segment_limits = [(segment[0], segment[-1]) for segment in segments]
+                segments_limits_per_row.append(segment_limits)
+            else:
+                segments_limits_per_row.append([])
+
+        return segments_limits_per_row
+
+    def _generate_paths(self, segments_limits_per_row, x_grid_values, y_grid_values):
+        paths = []
+        while (y_idx := next((i for i, segments in enumerate(segments_limits_per_row) if segments), None)):
+            positions = []
+            end_x = None
+            segment_idx = 0
+            direction = 'right'
+
+            while True:
+                x_segments = segments_limits_per_row[y_idx]
+
+                if end_x is not None:
+                    segment_idx = np.argmin(np.abs(np.mean(x_segments, axis=1) - end_x))
+
+                start_x, end_x = self.process_segment(x_segments[segment_idx], direction, x_grid_values)
+                cur_y = y_grid_values[y_idx]
+
+                if self.segment_has_intersection(positions, start_x, cur_y):
+                    break
+
+                positions.append([start_x, cur_y])
+                if start_x != end_x:
+                    positions.append([end_x, cur_y])
+
+                del segments_limits_per_row[y_idx][segment_idx]
+
+                if self.is_last_row_with_segments(y_idx, segments_limits_per_row):
+                    break
+
+                y_idx += 1
+                direction = 'right' if direction == 'left' else 'left'
+
+            paths.append(np.asarray(positions))
+        return paths
+
+    @property
+    def get_paths(self):
+        return self.paths
 
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'output_files\insole.STL'
@@ -261,7 +273,7 @@ if __name__ == "__main__":
     z_levels = np.arange(BLOCK_HEIGHT - real_z_step, min_z - real_z_step, -real_z_step)
 
     bondary_info = insole_proc.process_contours(0.1)
-    bondary_paths = get_paths(bondary_info, RASTER_STEP, STEP_OVER)
+    bondary_paths = RoughingGCodeGenerator(bondary_info, RASTER_STEP, STEP_OVER).paths
 
     response = []
     for z in z_levels:
@@ -270,7 +282,7 @@ if __name__ == "__main__":
             paths = bondary_paths
         else:
             contour_info = insole_proc.process_contours(z)
-            paths = get_paths(contour_info, RASTER_STEP, STEP_OVER)
+            paths = RoughingGCodeGenerator(contour_info, RASTER_STEP, STEP_OVER).paths
         current['paths'] = paths
         response.append(current)
     g_code = generate_gcode_from_paths(response, 36)
