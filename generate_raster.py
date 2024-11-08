@@ -1,47 +1,27 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from numpy import floating
 from numpy.typing import NDArray
 
 from functions.algebric_functions import lines_intersect_2d
-from generate_2d_contour import InsoleMeshProcessor
 
-class RoughingGCodeGenerator:
-    def __init__(self, contours_info, raster_step, step_over):
-        self.contours_info = contours_info
+
+class PathProcessor:
+    def __init__(self, insole_proc, raster_step, step_over, z_val):
+        self.insole_proc = insole_proc
         self.raster_step = raster_step
         self.step_over = step_over
+        self.z_val = z_val
 
-        self.x_grid_vals, self.y_grid_vals, self.bool_matrix = self._generate_boolean_matrix()
+        self.contours_info = self.insole_proc.process_contours(self.z_val)
+        self.paths = self.get_paths()
 
-        self.segments_limits_per_row = RoughingGCodeGenerator.get_segments_limits_per_row(self.bool_matrix)
+    def get_paths(self):
 
-        self.paths = self._generate_paths(self.segments_limits_per_row, self.x_grid_vals, self.y_grid_vals)
+        x_grid_vals, y_grid_vals, bool_matrix = self._generate_boolean_matrix()
 
-    @staticmethod
-    def find_intersections_with_contour(segment, contour_points):
-        """
-        Finds intersections between a line segment and the contour defined by 'contour_points'.
-        
-        segment: [(x1, y1), (x2, y2)] - The endpoints of the line segment.
-        contour_points: List of points (N x 2) defining the closed contour, where N is the number of points 
-                        and each point is represented as a tuple (x, y).
-        
-        Returns a list of intersection points.
-        """
-        intersections = []
+        segments_limits_per_row = self.get_segments_limits_per_row(bool_matrix)
 
-        p1, p2 = segment
-
-        for i in range(len(contour_points) - 1):
-            a = contour_points[i]
-            b = contour_points[i + 1]
-
-            intersection = lines_intersect_2d(p1, p2, a, b)
-            if intersection is not None:
-                intersections.append(intersection)
-
-        return np.asarray(intersections)
+        return self._generate_paths(segments_limits_per_row, x_grid_vals, y_grid_vals)
 
     def _generate_grid_values(self, intersec_points_2d: NDArray[floating]) -> tuple[NDArray[floating], NDArray[floating]]:
         """
@@ -54,17 +34,6 @@ class RoughingGCodeGenerator:
         y_vals = np.arange(y_min, y_max + self.step_over, self.step_over)
 
         return x_vals, y_vals
-
-    @staticmethod
-    def _update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections):
-        if len(intersections) % 2 != 0:
-            raise ValueError("Number of intersections is odd!")
-        for i in range(0, len(intersections), 2):
-            start = intersections[i]
-            end = intersections[i + 1]
-
-            x_start, x_end = start[0], end[0]
-            bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
 
     def _generate_boolean_matrix(self):
         intersec_points_2d = self.contours_info['intersection_points_2d']
@@ -90,13 +59,13 @@ class RoughingGCodeGenerator:
 
         return x_grid_vals, y_grid_vals, bool_matrix.T
 
-    def segment_has_intersection(self, positions, start_x, cur_y):
+    def segment_has_intersection(self, contours_info, positions, start_x, cur_y):
         if positions:
             last_point = np.asarray(positions[-1])
             cur_point = np.asarray([start_x, cur_y])
             intersections = []
-            for cl_info in self.contours_info['clusters']:
-                is_external_contour = cl_info['cluster_idx'] == self.contours_info['external_contour_idx']
+            for cl_info in contours_info['clusters']:
+                is_external_contour = cl_info['cluster_idx'] == contours_info['external_contour_idx']
                 points = cl_info['offset'] if not is_external_contour else cl_info['points']
                 cur_intersections = self.find_intersections_with_contour([last_point, cur_point], points[:, :2])
                 if cur_intersections.ndim == 2:
@@ -105,13 +74,40 @@ class RoughingGCodeGenerator:
                 return True
         return False
 
-    @staticmethod
-    def process_segment(x_idxs, direction, x_grid_values):
-        start_x_idx = x_idxs[0] if direction == 'right' else x_idxs[1]
-        end_x_idx = x_idxs[1] if direction == 'right' else x_idxs[0]
-        start_x = x_grid_values[start_x_idx]
-        end_x = x_grid_values[end_x_idx]
-        return start_x, end_x
+    def _generate_paths(self, segments_limits_per_row, x_grid_values, y_grid_values):
+        paths = []
+        while (y_idx := next((i for i, segments in enumerate(segments_limits_per_row) if segments), None)):
+            positions = []
+            end_x = None
+            segment_idx = 0
+            direction = 'right'
+
+            while True:
+                x_segments = segments_limits_per_row[y_idx]
+
+                if end_x is not None:
+                    segment_idx = np.argmin(np.abs(np.mean(x_segments, axis=1) - end_x))
+
+                start_x, end_x = self.process_segment(x_segments[segment_idx], direction, x_grid_values)
+                cur_y = y_grid_values[y_idx]
+
+                if self.segment_has_intersection(self.contours_info, positions, start_x, cur_y):
+                    break
+
+                positions.append([start_x, cur_y])
+                if start_x != end_x:
+                    positions.append([end_x, cur_y])
+
+                del segments_limits_per_row[y_idx][segment_idx]
+
+                if self.is_last_row_with_segments(y_idx, segments_limits_per_row):
+                    break
+
+                y_idx += 1
+                direction = 'right' if direction == 'left' else 'left'
+
+            paths.append(np.asarray(positions))
+        return paths
 
     @staticmethod
     def is_last_row_with_segments(y_idx, segments_limits_per_row):
@@ -135,155 +131,46 @@ class RoughingGCodeGenerator:
 
         return segments_limits_per_row
 
-    def _generate_paths(self, segments_limits_per_row, x_grid_values, y_grid_values):
-        paths = []
-        while (y_idx := next((i for i, segments in enumerate(segments_limits_per_row) if segments), None)):
-            positions = []
-            end_x = None
-            segment_idx = 0
-            direction = 'right'
+    @staticmethod
+    def process_segment(x_idxs, direction, x_grid_values):
+        start_x_idx = x_idxs[0] if direction == 'right' else x_idxs[1]
+        end_x_idx = x_idxs[1] if direction == 'right' else x_idxs[0]
+        start_x = x_grid_values[start_x_idx]
+        end_x = x_grid_values[end_x_idx]
+        return start_x, end_x
 
-            while True:
-                x_segments = segments_limits_per_row[y_idx]
+    @staticmethod
+    def _update_boolean_matrix_for_intersections(x_grid_vals, bool_matrix, y_index, intersections):
+        if len(intersections) % 2 != 0:
+            raise ValueError("Number of intersections is odd!")
+        for i in range(0, len(intersections), 2):
+            start = intersections[i]
+            end = intersections[i + 1]
 
-                if end_x is not None:
-                    segment_idx = np.argmin(np.abs(np.mean(x_segments, axis=1) - end_x))
+            x_start, x_end = start[0], end[0]
+            bool_matrix[(x_grid_vals >= x_start) & (x_grid_vals <= x_end), y_index] = True
 
-                start_x, end_x = self.process_segment(x_segments[segment_idx], direction, x_grid_values)
-                cur_y = y_grid_values[y_idx]
+    @staticmethod
+    def find_intersections_with_contour(segment, contour_points):
+        """
+        Finds intersections between a line segment and the contour defined by 'contour_points'.
+        
+        segment: [(x1, y1), (x2, y2)] - The endpoints of the line segment.
+        contour_points: List of points (N x 2) defining the closed contour, where N is the number of points 
+                        and each point is represented as a tuple (x, y).
+        
+        Returns a list of intersection points.
+        """
+        intersections = []
 
-                if self.segment_has_intersection(positions, start_x, cur_y):
-                    break
+        p1, p2 = segment
 
-                positions.append([start_x, cur_y])
-                if start_x != end_x:
-                    positions.append([end_x, cur_y])
+        for i in range(len(contour_points) - 1):
+            a = contour_points[i]
+            b = contour_points[i + 1]
 
-                del segments_limits_per_row[y_idx][segment_idx]
+            intersection = lines_intersect_2d(p1, p2, a, b)
+            if intersection is not None:
+                intersections.append(intersection)
 
-                if self.is_last_row_with_segments(y_idx, segments_limits_per_row):
-                    break
-
-                y_idx += 1
-                direction = 'right' if direction == 'left' else 'left'
-
-            paths.append(np.asarray(positions))
-        return paths
-
-    @property
-    def get_paths(self):
-        return self.paths
-
-if __name__ == "__main__":
-    INSOLE_FILE_PATH = r'output_files\insole.STL'
-    Z_VAL = 4
-    # INSOLE_FILE_PATH = r'input_files\test_complex2.STL'
-    # Z_VAL = 16
-    STEP_OVER = 3
-    RASTER_STEP = 1
-    MIN_RADIUS = 3
-
-
-    insole_proc = InsoleMeshProcessor(INSOLE_FILE_PATH, MIN_RADIUS)
-    # contours_information = insole_proc.process_contours(Z_VAL)
-
-    # x_grid_values, y_grid_values, boolean_matrix = generate_boolean_matrix(contours_information, RASTER_STEP, STEP_OVER)
-
-    # segments_limits_per_row = get_segments_limits_per_row(boolean_matrix)
-
-    # paths = generate_paths(segments_limits_per_row, x_grid_values, y_grid_values, contours_information)
-
-
-# # region Plotting the result
-#     true_coords = np.asarray([(x_grid_values[x_idx], y_grid_values[y_idx]) for y_idx, x_idx  in np.argwhere(boolean_matrix)])
-
-#     # plt.scatter(true_coords[:, 0], true_coords[:, 1], c='blue', marker='o', s=1, label='True Points')
-#     colors = ['black', 'blue', 'green', 'orange', 'purple', 'gray']
-#     for idx, path in enumerate(paths):
-#         plt.plot(path[:, 0], path[:, 1], 'o-', markersize=3, label=f'Contour {idx}', color=colors[idx % len(colors)])
-#     for cl_info in contours_information['clusters']:
-#         points = cl_info['points']
-#         plt.plot(points[:, 0], points[:, 1], 'ro-', markersize=3, label='Insole Contours')
-#         plt.plot(cl_info['offset'][:, 0], cl_info['offset'][:, 1], 'o-', markersize=3, label='Offset Contours')
-
-#     plt.gca().set(xlabel='X values', ylabel='Y values', title='Scatter Plot of True Points with Contours')
-#     plt.legend().set_draggable(True)
-#     plt.show()
-# # endregion
-
-
-    def get_min_z(insole_obj):
-        all_triangles = insole_obj.get_triangles
-        all_normals = insole_obj.mesh.face_normals
-
-        horizontal_triang_idxs = np.nonzero(all_normals[:, 2] > 1e-3)[0]
-
-        filt_triangles = all_triangles[horizontal_triang_idxs]
-
-        min_z = np.min(filt_triangles[:, :, 2])
-        max_z = np.max(filt_triangles[:, :, 2])
-        return min_z, max_z
-
-    def generate_gcode_from_paths(levels, safe_z=36):
-        rotation_speed = 15000
-        gcode = [
-            'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
-            "G21            ; Set units to millimeters",
-            'G49            ; Cancel any tool offset that might be active',
-            f"G0 Z{safe_z}         ; Move to safe height",
-            f"M3 S{rotation_speed}      ; Start spindle rotation clockwise (M3) at {rotation_speed} RPM"
-        ]
-
-        for level in levels:
-            z = level['z']
-            paths = level['paths']
-            
-            for path in paths:
-
-                x_start, y_start = path[0]
-                gcode.append(f"G0 X{x_start:.3f} Y{y_start:.3f}        ; Rapid positioning to start of path")
-
-                gcode.append(f"G1 Z{z:.3f}        ; Set depth to {z:.3f}")
-
-                if len(path > 1):
-                    for x, y in path[1:]:
-                        gcode.append(f"G1 X{x:.3f} Y{y:.3f}        ; Linear move")
-
-                gcode.append(f"G0 Z{safe_z}         ; Move to safe height",)
-
-        gcode.append("M30 ; Program end")
-
-        return "\n".join(gcode)
-
-
-    # Dimension = 140 x 350 x 34
-    BLOCK_HEIGHT = 34
-    BLOCK_WIDTH = 140
-    BLOCK_LENGTH = 350
-
-    Z_STEP = 6
-    Z_STEP_FINISH = 1
-
-    min_z, max_z = get_min_z(insole_proc)
-    min_z += Z_STEP_FINISH
-
-    delta_z = BLOCK_HEIGHT - min_z
-    real_z_step = delta_z / Z_STEP
-
-    z_levels = np.arange(BLOCK_HEIGHT - real_z_step, min_z - real_z_step, -real_z_step)
-
-    bondary_info = insole_proc.process_contours(0.1)
-    bondary_paths = RoughingGCodeGenerator(bondary_info, RASTER_STEP, STEP_OVER).paths
-
-    response = []
-    for z in z_levels:
-        current = {'z': z}
-        if z > max_z:
-            paths = bondary_paths
-        else:
-            contour_info = insole_proc.process_contours(z)
-            paths = RoughingGCodeGenerator(contour_info, RASTER_STEP, STEP_OVER).paths
-        current['paths'] = paths
-        response.append(current)
-    g_code = generate_gcode_from_paths(response, 36)
-    print(g_code)
+        return np.asarray(intersections)

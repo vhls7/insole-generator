@@ -37,27 +37,6 @@ class InsoleMeshProcessor:
         intersection_points = np.asarray(intersection.points)
         return intersection_points
 
-    def find_next_point(
-            self, current_point: NDArray[floating], points: NDArray[floating], previous_vector: NDArray[floating] | None
-    ) -> NDArray[floating] | None:
-        """Find the next point based on distance and angle constraints."""
-        max_angle = 90
-        distances = np.linalg.norm(points - current_point, axis=1)
-        sorted_indices = np.argsort(distances)
-
-        for idx in sorted_indices[1:]:
-            candidate_point = points[idx]
-            candidate_vector = candidate_point - current_point
-
-            if previous_vector is None:
-                return candidate_point
-
-            angle = calculate_angle(previous_vector, candidate_vector)
-            if angle <= max_angle:
-                return candidate_point
-
-        return None
-
     @property
     def get_triangles(self):
         # based on https://github.com/pyvista/pyvista/discussions/1465
@@ -65,21 +44,55 @@ class InsoleMeshProcessor:
         triangles = self.mesh_points[triangles_coord_idxs]
         return triangles
 
-    def ordering_points(self, points: NDArray[floating], z_val: float) -> NDArray[floating]:
+    def find_next_point(
+        self,
+        current_point: NDArray[np.floating],
+        points: NDArray[np.floating],
+        unused_mask: NDArray[np.bool_],
+        previous_vector: NDArray[np.floating] | None
+    ) -> tuple[NDArray[np.floating], int] | tuple[None, None]:
+        """Find the next point based on distance and angle constraints."""
+        max_angle = 90
+        remaining_points = points[unused_mask]
+        distances = np.linalg.norm(remaining_points - current_point, axis=1)
+        sorted_indices = np.argsort(distances)
+
+        for idx in sorted_indices:
+            candidate_point = remaining_points[idx]
+            candidate_vector = candidate_point - current_point
+
+            if previous_vector is None or calculate_angle(previous_vector, candidate_vector) <= max_angle:
+                original_idx = np.nonzero((points == candidate_point).all(axis=1))[0][0]
+                # Return the point and its index to remove it from the array
+                return candidate_point, original_idx
+
+        return None, None
+
+    def ordering_points(self, points: NDArray[np.floating], z_val: float) -> NDArray[np.floating]:
         """Order points based on proximity, starting from the lowest y-coordinate."""
-        current_point = points[np.argmin(points[:, 1])]
+        num_points = len(points)
+        unused_mask = np.ones(num_points, dtype=bool)
+
+        min_point_idx = np.argmin(points[:, 1])
+        current_point = points[min_point_idx]
         ordered_points = [np.append(current_point, z_val)]
+
+        unused_mask[np.argmin(points[:, 1])] = False
         previous_vector = None
 
-        while len(ordered_points) < len(points):
-
-            next_point = self.find_next_point(current_point, points, previous_vector)
+        while len(ordered_points) < num_points:
+            # Find the next point and its index
+            next_point, idx = self.find_next_point(current_point, points, unused_mask, previous_vector)
             if next_point is None:
                 break
 
+            # Add the next point to the ordered list
             ordered_points.append(np.append(next_point, z_val))
+
+            # Update vectors and current point, and remove used point from points array
             previous_vector = next_point - current_point
             current_point = next_point
+            unused_mask[idx] = False
 
         return np.array(ordered_points)
 
@@ -182,10 +195,22 @@ class InsoleMeshProcessor:
         equal_spaced_points = self.spline_interpolation(offset_points, self.spacing)
         return equal_spaced_points
 
+    def get_upper_surface_min_z(self, z_step_finish):
+        all_triangles = self.get_triangles
+        all_normals = self.mesh.face_normals
+
+        horizontal_triang_idxs = np.nonzero(all_normals[:, 2] > 1e-3)[0]
+
+        filt_triangles = all_triangles[horizontal_triang_idxs]
+
+        min_z = np.min(filt_triangles[:, :, 2]) + z_step_finish
+        max_z = np.max(filt_triangles[:, :, 2])
+        return min_z, max_z
+
 
 if __name__ == "__main__":
     INSOLE_FILE_PATH = r'input_files\test_complex2.STL'
-    Z_VAL = 16
+    Z_VAL = 18.66666666666667
     TOOL_RADIUS = 3
 
     processor = InsoleMeshProcessor(INSOLE_FILE_PATH, TOOL_RADIUS)
