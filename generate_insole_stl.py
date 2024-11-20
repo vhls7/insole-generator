@@ -96,10 +96,10 @@ def esphere_filt(points, radius):
 
 
 if __name__ == "__main__":
-    SCANNED_FILE_PATH = r'input_files\CFFFP_CARLOS - Pé Esquerdo.stl'
+    SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
-    PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base42_tipo3.stl'
+    PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
     FILT_SURF_FILE_PATH = r'output_files\filt_surf.stl'
     INSOLE_FILE_PATH = r'output_files\insole.stl'
 
@@ -113,9 +113,14 @@ if __name__ == "__main__":
 
     # Remaking surface
     scan_foot_coord_filt_surf = pv.wrap(scan_foot_coord_filt).reconstruct_surface() # type: ignore
-    result = parametric_insole.boolean_difference(scan_foot_coord_filt_surf)
-    #result = parametric_insole.boolean_intersection(scan_foot_coord_filt_surf)
+    result_1 = parametric_insole.boolean_difference(scan_foot_coord_filt_surf)
+    result_2 = parametric_insole.boolean_intersection(scan_foot_coord_filt_surf)
 
+    if (result_1.volume>result_2.volume):
+        result=result_1
+    else:
+        result=result_2
+        
     scan_foot_coord_filt_surf.save(FILT_SURF_FILE_PATH)
     result.save(INSOLE_FILE_PATH) # type: ignore
 
