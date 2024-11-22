@@ -1,18 +1,28 @@
 import numpy as np
 
 from generate_2d_contour import InsoleMeshProcessor
-from generate_raster import PathProcessor
-from functions.algebric_functions import intersect_line_triangle
-from time import time
+from functions.algebric_functions import find_triangle_containing_point
 
-class RoughingGCodeGenerator:
+def closer_triangles(all_triangles, point):
+    indices = []
+    for i, tri in enumerate(all_triangles):
+        if np.any(np.all(np.isclose(tri, point, atol=1e-5), axis=1)):
+            indices.append(i)
+    return all_triangles[indices]
+
+def get_closest_point(all_triangles, point):
+    vertices = all_triangles.reshape(-1, 3)
+    distances = np.linalg.norm(vertices - point, axis=1)
+    closest_vertex_index = np.argmin(distances)
+    closest_vertex = vertices[closest_vertex_index]
+    return closest_vertex
+
+
+class FinishingGCodeGenerator:
     def __init__(self, insole_file_path, config):
-        start_time = time()
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
-        print(time() - start_time)
         self.get_path_points(self.insole_proc)
-        print(time() - start_time)
 
     def get_path_points(self, insole_obj):
         z = self.config['safe_z']
@@ -48,22 +58,20 @@ class RoughingGCodeGenerator:
                 np.any(np.abs(upward_triangles[:, :, 0] - point[0]) < tolerance, axis=1)
                 & np.any(np.abs(upward_triangles[:, :, 1] - point[1]) < tolerance, axis=1)
             ]
-            point2 = point - [0, 0, 100]
-            result = next(
-                (
-                    np.mean((np.array(a)[2], np.array(b)[2], np.array(c)[2]))
-                    for a, b, c in filt_triangles
-                    if intersect_line_triangle(point, point2, np.array(a), np.array(b), np.array(c))
-                ),
-                None
-            )
-            if result is not None:
-                point[2] = result
+            if len(filt_triangles) == 0:
+                ordered_points[idx] = None
+                continue
+            intersect_triang_idx = find_triangle_containing_point(point[:2], filt_triangles[:, :, :2])
+            if intersect_triang_idx is not None:
+                intersect_triang = filt_triangles[intersect_triang_idx]
+                a, b, c = intersect_triang
+                vertex_avg = np.mean((a[2], b[2], c[2]))
+                point[2] = vertex_avg
             else:
                 point = None
 
             ordered_points[idx] = point
-        
+
         ordered_points = [point for point in ordered_points if point is not None]
 
         filt_points = [ordered_points[0]]
@@ -99,5 +107,5 @@ if __name__ == "__main__":
         'only_contour_height': 0.1
     }
 
-    g_code = RoughingGCodeGenerator(INSOLE_FILE_PATH, CONFIG)
+    g_code = FinishingGCodeGenerator(INSOLE_FILE_PATH, CONFIG)
     print(g_code)

@@ -128,3 +128,48 @@ def intersect_line_triangle(p1, p2, a, b, c):
     if is_point_inside_triang:
         return True
     return False
+
+def find_triangle_containing_point(point, triangles):
+    """
+    Finds the first triangle containing the given point using barycentric coordinates.
+
+    Args:
+        point (array-like): The point in the format (x, y).
+        triangles (array-like): An array of triangles, where each triangle is defined by
+                                3 vertices in the format [(x1, y1), (x2, y2), (x3, y3)].
+
+    Returns:
+        int: The index of the first triangle containing the point, or None if no triangle contains it.
+    """
+    point = np.array(point)
+    triangles = np.array(triangles)  # Shape: (N, 3, 2)
+
+    a, b, c = triangles[:, 0], triangles[:, 1], triangles[:, 2]
+
+    v0 = c - a  # C - A
+    v1 = b - a  # B - A
+    v2 = point - a  # P - A (for all triangles)
+
+    # Compute dot products
+    dot00 = np.einsum('ij,ij->i', v0, v0)  # v0 · v0
+    dot01 = np.einsum('ij,ij->i', v0, v1)  # v0 · v1
+    dot02 = np.einsum('ij,ij->i', v0, v2)  # v0 · v2
+    dot11 = np.einsum('ij,ij->i', v1, v1)  # v1 · v1
+    dot12 = np.einsum('ij,ij->i', v1, v2)  # v1 · v2
+
+    # Compute determinant (denom)
+    denom = dot00 * dot11 - dot01 * dot01
+
+    # Avoid division by zero for degenerate triangles
+    valid = denom != 0
+    denom[~valid] = 1
+
+    u = (dot11 * dot02 - dot01 * dot12) / denom
+    v = (dot00 * dot12 - dot01 * dot02) / denom
+
+    # Check if the point is inside the triangle
+    inside = (u >= 0) & (v >= 0) & (u + v <= 1) & valid
+
+    # Return the first triangle containing the point, or None if no triangle contains it
+    indices = np.nonzero(inside)[0]
+    return indices[0] if indices.size > 0 else None
