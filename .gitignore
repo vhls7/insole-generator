@@ -166,3 +166,5 @@ cython_debug/
 *.SLDPRT
 input_files/CFFFP_CARLOS - Pé Esquerdo.stl
 input_files/CFFFP_Clayton Esquerdo.stl
+INTERFACE_WEB/input_files/CFFFP_Clayton Esquerdo.stl
+INTERFACE_WEB/input_files/ESQ_base45_tipo3_S.stl
