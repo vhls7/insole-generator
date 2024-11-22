@@ -94,33 +94,34 @@ def esphere_filt(points, radius):
         print_progress_bar(len(points) - len(remaining_points), len(points), length=50)
     return np.array(filtered_points)
 
+def get_intersection(base_insole, scan_surface):
+    result_1 = base_insole.boolean_difference(scan_surface)
+    result_2 = base_insole.boolean_intersection(scan_surface)
+
+    if (result_1.volume > result_2.volume):
+        return result_1
+    return result_2
 
 if __name__ == "__main__":
-    SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
+    SCANNED_FILE_PATH = r'input_files\julia.stl'
    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
-    PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
+    PARAMETRIC_INSOLE_FILE_PATH = r'input_files\palmilha6.stl'
     FILT_SURF_FILE_PATH = r'output_files\filt_surf.stl'
     INSOLE_FILE_PATH = r'output_files\insole.stl'
 
-    #scan_foot = process_stl(SCANNED_FILE_PATH, angle_x=-90, angle_y=-268, angle_z=180, axis='z', cut_value=15)
-    scan_foot = process_stl(SCANNED_FILE_PATH, angle_x=-3, angle_y=1, angle_z=275, axis='z', cut_value=20)#45 esq
-    parametric_insole = process_stl(PARAMETRIC_INSOLE_FILE_PATH, angle_z=280)
+    scan_foot = process_stl(SCANNED_FILE_PATH, angle_x=-90, angle_y=-268, angle_z=180, axis='z', cut_value=15)
+    parametric_insole = process_stl(PARAMETRIC_INSOLE_FILE_PATH, angle_z=270)
 
-    scan_foot.translate([-50, -5, 4], inplace=True) # 13
-    parametric_insole.translate([0, 0, 0], inplace=True) # 13
-    scan_foot_coord_filt = esphere_filt(scan_foot.points,5)
+    scan_foot.translate([0, 0, 9], inplace=True)
+    parametric_insole.translate([0, 0, 3], inplace=True)
+    scan_foot_coord_filt = esphere_filt(scan_foot.points, 3)
 
     # Remaking surface
     scan_foot_coord_filt_surf = pv.wrap(scan_foot_coord_filt).reconstruct_surface() # type: ignore
-    result_1 = parametric_insole.boolean_difference(scan_foot_coord_filt_surf)
-    result_2 = parametric_insole.boolean_intersection(scan_foot_coord_filt_surf)
 
-    if (result_1.volume>result_2.volume):
-        result=result_1
-    else:
-        result=result_2
-        
+    result = get_intersection(parametric_insole, scan_foot_coord_filt_surf)
+
     scan_foot_coord_filt_surf.save(FILT_SURF_FILE_PATH)
     result.save(INSOLE_FILE_PATH) # type: ignore
 

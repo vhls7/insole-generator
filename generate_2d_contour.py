@@ -209,7 +209,7 @@ class InsoleMeshProcessor:
 
 
 if __name__ == "__main__":
-    INSOLE_FILE_PATH = r'input_files\test_complex2.STL'
+    INSOLE_FILE_PATH = r'input_files\test_complex.STL'
     Z_VAL = 18.66666666666667
     TOOL_RADIUS = 3
 
