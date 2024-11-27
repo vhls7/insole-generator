@@ -17,12 +17,37 @@ def get_closest_point(all_triangles, point):
     closest_vertex = vertices[closest_vertex_index]
     return closest_vertex
 
+def filter_sequences(points):
+    """
+    Remove intermediate points in sequences where only x varies, keeping y and z constant.
+    Retains the first and last points of each sequence and respects the original order.
+
+    Args:
+        points (ndarray): Array of coordinates in the format (N, 3) with x, y, z.
+
+    Returns:
+        ndarray: Filtered array.
+    """
+    filtered_points = []
+    n = len(points)
+
+    for i in range(n):
+        # Check if the current point is part of a sequence
+        is_start = (i == 0 or not np.array_equal(points[i, 1:], points[i - 1, 1:]))
+        is_end = (i == n - 1 or not np.array_equal(points[i, 1:], points[i + 1, 1:]))
+
+        # Keep points that are either the start or end of a sequence
+        if is_start or is_end:
+            filtered_points.append(points[i])
+
+    return np.array(filtered_points)
 
 class FinishingGCodeGenerator:
     def __init__(self, insole_file_path, config):
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
-        self.get_path_points(self.insole_proc)
+        self.path_points = self.get_path_points(self.insole_proc)
+        print(self.generate_gcode())
 
     def get_path_points(self, insole_obj):
         z = self.config['safe_z']
@@ -81,13 +106,35 @@ class FinishingGCodeGenerator:
             if point[1] != last_point[1] or point[2] != last_point[2]:
                 filt_points.extend([ordered_points[idx - 1], point])
 
-        import pyvista as pv
-        lines = insole_obj.get_contour_lines(np.asarray(filt_points))
-        plotter = pv.Plotter()
-        plotter.add_mesh(pv.PolyData(upward_triangles_points), color='red')
-        plotter.add_mesh(pv.PolyData(ordered_points), color='blue')
-        plotter.add_lines(np.array(lines).reshape(-1, 3)[:-2], color='blue', width=5)
-        plotter.show()
+        return filt_points
+
+        # import pyvista as pv
+        # lines = insole_obj.get_contour_lines(np.asarray(filt_points))
+        # plotter = pv.Plotter()
+        # plotter.add_mesh(pv.PolyData(upward_triangles_points), color='red')
+        # plotter.add_mesh(pv.PolyData(ordered_points), color='blue')
+        # plotter.add_lines(np.array(lines).reshape(-1, 3)[:-2], color='blue', width=5)
+        # plotter.show()
+
+    def generate_gcode(self):
+        gcode = [
+            'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
+            "G21            ; Set units to millimeters",
+            'G49            ; Cancel any tool offset that might be active',
+            f"G0 Z{self.config['safe_z']}         ; Move to safe height",
+            f"M3 S{self.config['rotation_speed']}      ; Start spindle rotation clockwise (M3) at {self.config['rotation_speed']} RPM"
+        ]
+
+
+        for x, y, z in self.path_points:
+            gcode.append(f"G1 X{x:.3f} Y{y:.3f} Z{z:.3f}   ; Linear move")
+
+        gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
+
+        gcode.append("M30 ; Program end")
+
+        with open('gcode.txt', 'w') as file:
+            file.write("\n".join(gcode))
 
 
 if __name__ == "__main__":
