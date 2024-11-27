@@ -131,8 +131,8 @@ if __name__ == "__main__":
     pl.add_title('Superfície Original')
     pl.subplot(0, 1)
 
-    pl.add_mesh(parametric_insole, color=True, show_edges=True)
-    pl.add_mesh(scan_foot_coord_filt_surf, color=True, show_edges=True)
+    pl.add_mesh(parametric_insole, color='orange', show_edges=False)
+    pl.add_mesh(scan_foot_coord_filt_surf, color='lightblue', show_edges=False)
     pl.add_title('Superfície Reconstruida')
     pl.show()
 
