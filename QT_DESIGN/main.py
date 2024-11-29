@@ -1,9 +1,11 @@
 import sys
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from pyvistaqt import QtInteractor  # Integração PyVista com Qt
 import pyvista  # Import necessário para usar recursos do PyVista
-import numpy as np
+import numpy as np 
+import resources_rc
 
 
 # Caminho do arquivo STL a ser carregado
