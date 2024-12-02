@@ -220,7 +220,7 @@ QPushButton:pressed {
     <property name="title">
      <string/>
     </property>
-    <widget class="QPushButton" name="btn_load_files">
+    <widget class="QPushButton" name="btn_load_base">
      <property name="geometry">
       <rect>
        <x>14</x>
@@ -253,7 +253,7 @@ QPushButton:pressed {
       </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_load_files_2">
+    <widget class="QPushButton" name="btn_load_scan">
      <property name="geometry">
       <rect>
        <x>160</x>
@@ -286,7 +286,7 @@ QPushButton:pressed {
       </size>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_load_files_3">
+    <widget class="QPushButton" name="btn_limpa">
      <property name="geometry">
       <rect>
        <x>529</x>
