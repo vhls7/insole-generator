@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from pyvistaqt import QtInteractor
-import pyvista
+import pyvista as pv
 import numpy as np
 from PyQt5.QtCore import Qt
 import resources_rc
@@ -13,17 +13,16 @@ import resources_rc
 SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
 PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
 
-#Variáveis globais 
-Pan_X_value=0
-Pan_Y_value=0
-Pan_Z_value=0
-Orbit_Z_value=0
+Pan_X_value = 0
+Pan_Y_value = 0
+Pan_Z_value = 0
+Orbit_Z_value = 0
 
 def get_centroid(your_mesh):
     centroid = np.mean(your_mesh.points.reshape(-1, 3), axis=0)
     return centroid
 
-def rotate_mesh(mesh: pyvista.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centroid=False) -> pyvista.PolyData:
+def rotate_mesh(mesh: pv.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centroid=False) -> pv.PolyData:
     centroid = get_centroid(mesh)
 
     if around_centroid:
@@ -49,7 +48,7 @@ def get_centroid2(your_mesh):
     ])
     return centroid
 
-def cut_mesh(mesh: pyvista.PolyData, axis, cut_value=0) -> pyvista.PolyData:
+def cut_mesh(mesh: pv.PolyData, axis, cut_value=0) -> pv.PolyData:
     """Clip the mesh along a specified axis at a given cut value."""
     bounds = mesh.bounds  # mesh.bounds returns [xmin, xmax, ymin, ymax, zmin, zmax]
 
@@ -152,9 +151,9 @@ class MainWindow(QtWidgets.QMainWindow):
         global Pan_Y_value
         global Pan_Z_value
 
-        delta_X=Pan_X_value-self.Pan_X.value()
-        delta_Y=Pan_Y_value-self.Pan_Y.value()
-        delta_Z=Pan_Z_value-self.Pan_Z.value()
+        delta_X = Pan_X_value - self.Pan_X.value()
+        delta_Y = Pan_Y_value - self.Pan_Y.value()
+        delta_Z = Pan_Z_value - self.Pan_Z.value()
         Pan_X_value = self.Pan_X.value()
         Pan_Y_value = self.Pan_Y.value()
         Pan_Z_value = self.Pan_Z.value()
@@ -162,7 +161,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_dial_value(self):
         global Orbit_Z_value
-        delta_Z=Orbit_Z_value-self.Orbit_Z.value()
+        delta_Z = Orbit_Z_value - self.Orbit_Z.value()
         Orbit_Z_value = self.Orbit_Z.value()
         self.mesh_scanned = rotate_mesh(self.mesh_scanned, 0, 0, delta_Z, True)
 
@@ -171,10 +170,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window_loading = LOADING()
         self.window_loading.show()
         fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
-        self.mesh_scanned = pyvista.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
+        self.mesh_scanned = pv.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
         self.mesh_scanned = esphere_filt(self.mesh_scanned.points, 2)
         # Remaking surface
-        self.mesh_scanned = pyvista.wrap(self.mesh_scanned).reconstruct_surface() # type: ignore
+        self.mesh_scanned = pv.wrap(self.mesh_scanned).reconstruct_surface() # type: ignore
 
         # Exibe o arquivo SCANNED_FILE_PATH no gráfico 3D
         self.plotter.add_mesh(self.mesh_scanned, color="lightblue", label="Scanned")
@@ -191,7 +190,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window_loading = LOADING()
         self.window_loading.show()
         fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
-        self.mesh_parametric = pyvista.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
+        self.mesh_parametric = pv.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
 
         # Exibe o arquivo PARAMETRIC_INSOLE_FILE_PATH no gráfico 3D
         self.plotter.add_mesh(self.mesh_parametric, color="orange", label="Parametric Insole")
