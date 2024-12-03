@@ -5,12 +5,13 @@ from PyQt5.QtGui import *
 from pyvistaqt import QtInteractor
 import pyvista
 import numpy as np
+from PyQt5.QtCore import Qt
 import resources_rc
 
 
 # Caminho do arquivo STL a ser carregado
 SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
-PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
+PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
 
 #Variáveis globais 
 Pan_X_value=0
@@ -103,8 +104,12 @@ class MainWindow(QtWidgets.QMainWindow):
         container.setLayout(layout)
 
         # Conectar o botão
-        load = self.findChild(QtWidgets.QPushButton, "btn_load_files")
-        load.clicked.connect(self.load_models)
+        load_scan = self.findChild(QtWidgets.QPushButton, "loadScanButton")
+        load_scan.clicked.connect(self.load_models)
+
+        # Conectar o botão
+        load_base = self.findChild(QtWidgets.QPushButton, "loadBaseButton")
+        load_base.clicked.connect(self.load_bases)
 
         # Conectar o botão
         Pan_X = self.findChild(QtWidgets.QSlider, "Pan_X")
@@ -123,7 +128,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Orbit_Z.valueChanged.connect(self.update_dial_value)
 
         # Conectar o botão
-        CUT = self.findChild(QtWidgets.QPushButton, "btn_CUT")
+        CUT = self.findChild(QtWidgets.QPushButton, "cutButton")
         CUT.clicked.connect(self.cut_insole)
 
         # Conectar o botão
@@ -138,7 +143,9 @@ class MainWindow(QtWidgets.QMainWindow):
         cam_frontal = self.findChild(QtWidgets.QPushButton, "cam_frontal")
         cam_frontal.clicked.connect(self.FRONT_VIEW)
 
-
+        # Conectar o botão
+        btn_limpa = self.findChild(QtWidgets.QPushButton, "cleanButton")
+        btn_limpa.clicked.connect(self.CLEAN_ALL)
 
     def update_slider_value(self):
         global Pan_X_value
@@ -160,19 +167,41 @@ class MainWindow(QtWidgets.QMainWindow):
         self.mesh_scanned = rotate_mesh(self.mesh_scanned, 0, 0, delta_Z, True)
 
     def load_models(self):
-        self.mesh_scanned = pyvista.read(SCANNED_FILE_PATH)  # Lê o arquivo STL do SCANNED_FILE_PATH
-        self.mesh_parametric = pyvista.read(PARAMETRIC_INSOLE_FILE_PATH)  # Lê o arquivo STL do PARAMETRIC_INSOLE_FILE_PATH
+
+        self.window_loading = LOADING()
+        self.window_loading.show()
+        fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
+        self.mesh_scanned = pyvista.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
+        self.mesh_scanned = esphere_filt(self.mesh_scanned.points, 2)
+        # Remaking surface
+        self.mesh_scanned = pyvista.wrap(self.mesh_scanned).reconstruct_surface() # type: ignore
+
         # Exibe o arquivo SCANNED_FILE_PATH no gráfico 3D
         self.plotter.add_mesh(self.mesh_scanned, color="lightblue", label="Scanned")
-        
-        # Exibe o arquivo PARAMETRIC_INSOLE_FILE_PATH no gráfico 3D
-        self.plotter.add_mesh(self.mesh_parametric, color="orange", label="Parametric Insole")
-        
+
         # Mostrar a grade e os eixos
         self.plotter.add_axes()
-        
+
         # Ajustar a câmera para se ajustar aos modelos
         self.plotter.reset_camera()
+        self.window_loading.close()
+
+    def load_bases(self):
+
+        self.window_loading = LOADING()
+        self.window_loading.show()
+        fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
+        self.mesh_parametric = pyvista.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
+
+        # Exibe o arquivo PARAMETRIC_INSOLE_FILE_PATH no gráfico 3D
+        self.plotter.add_mesh(self.mesh_parametric, color="orange", label="Parametric Insole")
+
+        # Mostrar a grade e os eixos
+        self.plotter.add_axes()
+
+        # Ajustar a câmera para se ajustar aos modelos
+        self.plotter.reset_camera()
+        self.window_loading.close()
 
     def update_plotter(self):
         """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""       
@@ -216,9 +245,23 @@ class MainWindow(QtWidgets.QMainWindow):
         ]
         self.plotter.reset_camera()
 
+    def CLEAN_ALL(self):
+        self.plotter.clear_actors()  # Limpa o gráfico atual
+
+
+class LOADING(QtWidgets.QDialog):
+    def __init__(self):
+        super(LOADING, self).__init__()
+        # Carregar a interface criada no Qt Designer
+        uic.loadUi(r"QT_DESIGN\loading.ui", self)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
+
+
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
-    window = MainWindow()
-    window.show()
+    window_main = MainWindow()
+    window_main.show()
     sys.exit(app.exec_())
