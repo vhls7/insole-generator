@@ -2,9 +2,9 @@ import sys
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from pyvistaqt import QtInteractor  # Integração PyVista com Qt
-import pyvista  # Import necessário para usar recursos do PyVista
-import numpy as np 
+from pyvistaqt import QtInteractor
+import pyvista
+import numpy as np
 import resources_rc
 
 
@@ -21,7 +21,7 @@ Orbit_Z_value=0
 def get_centroid(your_mesh):
     centroid = np.mean(your_mesh.points.reshape(-1, 3), axis=0)
     return centroid
-        
+
 def rotate_mesh(mesh: pyvista.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centroid=False) -> pyvista.PolyData:
     centroid = get_centroid(mesh)
 
@@ -36,10 +36,6 @@ def rotate_mesh(mesh: pyvista.PolyData, angle_x=0, angle_y=0, angle_z=0, around_
         mesh.translate(centroid, inplace=True)
 
     return mesh
-
-def get_centroid(your_mesh):
-    centroid = np.mean(your_mesh.points.reshape(-1, 3), axis=0)
-    return centroid
 
 def get_centroid2(your_mesh):
     bounds = your_mesh.bounds
@@ -51,21 +47,6 @@ def get_centroid2(your_mesh):
         (bounds[4] + bounds[5]) / 2  # z
     ])
     return centroid
-def rotate_mesh(mesh: pyvista.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centroid=False) -> pyvista.PolyData:
-    """Rotate the mesh around its centroid."""
-    centroid = get_centroid(mesh)
-
-    if around_centroid:
-        mesh.translate(-centroid, inplace=True)
-
-    mesh.rotate_x(angle_x, inplace=True)
-    mesh.rotate_y(angle_y, inplace=True)
-    mesh.rotate_z(angle_z, inplace=True)
-
-    if around_centroid:
-        mesh.translate(centroid, inplace=True)
-
-    return mesh
 
 def cut_mesh(mesh: pyvista.PolyData, axis, cut_value=0) -> pyvista.PolyData:
     """Clip the mesh along a specified axis at a given cut value."""
@@ -106,13 +87,15 @@ def esphere_filt(points, radius):
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        super().__init__()
         # Carregar a interface criada no Qt Designer
-        uic.loadUi("main.ui", self)
-        
+        uic.loadUi(r"QT_DESIGN\main.ui", self)
+
+        self.showMaximized()
+
         # Obtenha o widget onde o PyVista será inserido
         container = self.findChild(QtWidgets.QWidget, "pyvistaWidget")
-        
+
         # Configurar o layout e adicionar o plotter
         layout = QVBoxLayout()
         self.plotter = QtInteractor(container)
@@ -141,13 +124,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Conectar o botão
         CUT = self.findChild(QtWidgets.QPushButton, "btn_CUT")
-        CUT.clicked.connect(self.CUT_PALMILHA)
+        CUT.clicked.connect(self.cut_insole)
 
         # Conectar o botão
         cam_topo = self.findChild(QtWidgets.QPushButton, "cam_topo")
         cam_topo.clicked.connect(self.TOPO_VIEW)
 
-        
         # Conectar o botão
         cam_lateral = self.findChild(QtWidgets.QPushButton, "cam_lateral")
         cam_lateral.clicked.connect(self.LATERAL_VIEW)
@@ -198,8 +180,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Repinta os dois modelos no gráfico
         self.plotter.add_mesh(self.result, color="lightblue", label="Resultado")
         self.plotter.update()  # Atualiza o gráfico sem perder as configurações de exibição
-    
-    def CUT_PALMILHA(self):
+
+    def cut_insole(self):
         result_1 = self.mesh_parametric.boolean_difference(self.mesh_scanned)
         result_2 = self.mesh_parametric.boolean_intersection(self.mesh_scanned)
 
@@ -207,8 +189,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.result=result_1
         else:
             self.result=result_2
+
         self.update_plotter()
-        
 
     def TOPO_VIEW(self):
         self.plotter.camera_position = [

@@ -1,7 +1,8 @@
 <RCC>
   <qresource prefix="icons">
-    <file>LOGO.png</file>
+    <file>logo_resized.png</file>
     <file>chart2.jpg</file>
+    <file>LOGO.png</file>
     <file>icons/account.svg</file>
     <file>icons/cloud-arrow-up-solid.svg</file>
     <file>icons/trash-can-solid.svg</file>
