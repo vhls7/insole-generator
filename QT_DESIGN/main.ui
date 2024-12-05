@@ -88,7 +88,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>:/icons/logo_resized.png</pixmap>
+          <pixmap resource="resources/resources.qrc">:/icons/logo_resized.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>false</bool>
@@ -517,7 +517,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="Pan_X">
+            <widget class="QSlider" name="panX">
              <property name="maximumSize">
               <size>
                <width>300</width>
@@ -549,7 +549,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="Pan_Y">
+            <widget class="QSlider" name="panY">
              <property name="maximumSize">
               <size>
                <width>300</width>
@@ -581,7 +581,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="Pan_Z">
+            <widget class="QSlider" name="panZ">
              <property name="maximumSize">
               <size>
                <width>300</width>
@@ -643,7 +643,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QDial" name="Orbit_Z">
+            <widget class="QDial" name="orbitZ">
              <property name="minimumSize">
               <size>
                <width>100</width>
@@ -669,7 +669,7 @@ QPushButton:pressed {
             <number>10</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="camLabel">
              <property name="maximumSize">
               <size>
                <width>16777215</width>
@@ -690,7 +690,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="cam_lateral">
+            <widget class="QPushButton" name="latCam">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -741,7 +741,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="cam_topo">
+            <widget class="QPushButton" name="topCam">
              <property name="minimumSize">
               <size>
                <width>120</width>
@@ -780,7 +780,7 @@ QPushButton:pressed {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="cam_frontal">
+            <widget class="QPushButton" name="frontCam">
              <property name="minimumSize">
               <size>
                <width>120</width>
@@ -865,6 +865,22 @@ QPushButton:pressed {
         <number>4</number>
        </property>
        <item>
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="filesInfoContainer"/>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -914,7 +930,7 @@ QPushButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_load_files_8">
+        <widget class="QPushButton" name="exportButton">
          <property name="minimumSize">
           <size>
            <width>0</width>

@@ -1,22 +1,24 @@
-import sys
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from pyvistaqt import QtInteractor
-import pyvista as pv
-import numpy as np
-from PyQt5.QtCore import Qt
-import resources_rc
+# pylint: disable=I1101, W0401
 
+import os
+import sys
+
+import numpy as np
+import pyvista as pv
+import resources_rc
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import Qt  # pylint: disable=no-name-in-module
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from pyvistaqt import QtInteractor
 
 # Caminho do arquivo STL a ser carregado
 SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
 PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
 
-Pan_X_value = 0
-Pan_Y_value = 0
-Pan_Z_value = 0
-Orbit_Z_value = 0
+pan_x_value = 0
+pan_y_value = 0
+pan_z_value = 0
 
 def get_centroid(your_mesh):
     centroid = np.mean(your_mesh.points.reshape(-1, 3), axis=0)
@@ -88,173 +90,243 @@ def esphere_filt(points, radius):
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        # Carregar a interface criada no Qt Designer
+        self.window_loading = None
+
+        self.scanned_file_info = {}
+        self.scanned_mesh_display = None
+
+        self.base_insole_file_info = {}
+        self.base_insole_mesh_display = None
+
+        self.insole_output = None
+
+        # Loading interface developed in Qt Designer
         uic.loadUi(r"QT_DESIGN\main.ui", self)
+
+        self.rotation_angle = 0
+        self.offset_x = 0
+        self.offset_y = 0
+        self.offset_z = 0
 
         self.showMaximized()
 
-        # Obtenha o widget onde o PyVista será inserido
-        container = self.findChild(QtWidgets.QWidget, "pyvistaWidget")
+        # Adding pyvista plotter to the interface widget
+        pyvista_widget = self.findChild(QtWidgets.QWidget, "pyvistaWidget")
+        self.layout = QVBoxLayout() # pylint: disable=undefined-variable
+        self.plotter = QtInteractor(pyvista_widget)
+        self.plotter.add_axes()
 
-        # Configurar o layout e adicionar o plotter
-        layout = QVBoxLayout()
-        self.plotter = QtInteractor(container)
-        layout.addWidget(self.plotter.interactor)
-        container.setLayout(layout)
+        self.layout.addWidget(self.plotter.interactor)
+        pyvista_widget.setLayout(self.layout)
 
-        # Conectar o botão
+        # region Connecting buttons to functions
         load_scan = self.findChild(QtWidgets.QPushButton, "loadScanButton")
-        load_scan.clicked.connect(self.load_models)
+        load_scan.clicked.connect(self.load_scan_model)
 
-        # Conectar o botão
         load_base = self.findChild(QtWidgets.QPushButton, "loadBaseButton")
         load_base.clicked.connect(self.load_bases)
 
-        # Conectar o botão
-        Pan_X = self.findChild(QtWidgets.QSlider, "Pan_X")
-        Pan_X.valueChanged.connect(self.update_slider_value)
+        pan_x = self.findChild(QtWidgets.QSlider, "panX")
+        pan_x.valueChanged.connect(self.update_slider_value)
 
-        # Conectar o botão
-        Pan_Y = self.findChild(QtWidgets.QSlider, "Pan_Y")
-        Pan_Y.valueChanged.connect(self.update_slider_value)
+        pan_y = self.findChild(QtWidgets.QSlider, "panY")
+        pan_y.valueChanged.connect(self.update_slider_value)
 
-        # Conectar o botão
-        Pan_Z = self.findChild(QtWidgets.QSlider, "Pan_Z")
-        Pan_Z.valueChanged.connect(self.update_slider_value)
+        pan_z = self.findChild(QtWidgets.QSlider, "panZ")
+        pan_z.valueChanged.connect(self.update_slider_value)
 
-        # Conectar o botão
-        Orbit_Z = self.findChild(QtWidgets.QDial, "Orbit_Z")
-        Orbit_Z.valueChanged.connect(self.update_dial_value)
+        orbit_z = self.findChild(QtWidgets.QDial, "orbitZ")
+        orbit_z.valueChanged.connect(self.update_dial_value)
 
-        # Conectar o botão
-        CUT = self.findChild(QtWidgets.QPushButton, "cutButton")
-        CUT.clicked.connect(self.cut_insole)
+        cut_but = self.findChild(QtWidgets.QPushButton, "cutButton")
+        cut_but.clicked.connect(self.cut_insole)
 
-        # Conectar o botão
-        cam_topo = self.findChild(QtWidgets.QPushButton, "cam_topo")
-        cam_topo.clicked.connect(self.TOPO_VIEW)
+        top_cam = self.findChild(QtWidgets.QPushButton, "topCam")
+        top_cam.clicked.connect(lambda: self.set_camera_view('top'))
 
-        # Conectar o botão
-        cam_lateral = self.findChild(QtWidgets.QPushButton, "cam_lateral")
-        cam_lateral.clicked.connect(self.LATERAL_VIEW)
+        lat_cam = self.findChild(QtWidgets.QPushButton, "latCam")
+        lat_cam.clicked.connect(lambda: self.set_camera_view('lateral'))
 
-        # Conectar o botão
-        cam_frontal = self.findChild(QtWidgets.QPushButton, "cam_frontal")
-        cam_frontal.clicked.connect(self.FRONT_VIEW)
+        front_cam = self.findChild(QtWidgets.QPushButton, "frontCam")
+        front_cam.clicked.connect(lambda: self.set_camera_view('front'))
 
-        # Conectar o botão
-        btn_limpa = self.findChild(QtWidgets.QPushButton, "cleanButton")
-        btn_limpa.clicked.connect(self.CLEAN_ALL)
+        clean_but = self.findChild(QtWidgets.QPushButton, "cleanButton")
+        clean_but.clicked.connect(self.clean_plot)
+
+        self.files_info_container = self.findChild(QtWidgets.QVBoxLayout, "filesInfoContainer")
+        # endregion
+
+    def build_files_list(self):
+        # Cleaning the files_info_container to build from scratch
+        while self.files_info_container.count() > 0:
+            child = self.files_info_container.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+
+        for file_info in (self.scanned_file_info, self.base_insole_file_info):
+            if not file_info:
+                continue
+            file_name = file_info['file_name']
+            # Criação de um QFrame para representar o item
+            selec_file_container = QtWidgets.QFrame()
+            selec_file_container.setFrameShape(QtWidgets.QFrame.StyledPanel)
+
+            # Horizontal layout for the item
+            item_hlayout = QtWidgets.QHBoxLayout(selec_file_container)
+
+            file_label = QtWidgets.QLabel(file_name)
+            item_hlayout.addWidget(file_label)
+
+            description_label = QtWidgets.QLabel(file_info['description'])
+            item_hlayout.addWidget(description_label)
+
+            delete_button = QtWidgets.QPushButton()
+            delete_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_TrashIcon))
+
+            # Usar lambda com parâmetro fixado para evitar erro de referência tardia
+            delete_button.clicked.connect(lambda _, item=selec_file_container, name=file_name: self.remove_file_item(item, name))
+            item_hlayout.addWidget(delete_button)
+
+            # Adding the frame to the vBox container
+            self.files_info_container.addWidget(selec_file_container)
+
+    def remove_file_item(self, file_item=None, file_name='', remove_all=False):
+        # Removing selected file
+        for attr, display_attr in [
+            ("scanned_file_info", "scanned_mesh_display"), 
+            ("base_insole_file_info", "base_insole_mesh_display")
+        ]:
+            file_info = getattr(self, attr)
+            if (file_info and file_info['file_name'] == file_name) or remove_all:
+                setattr(self, attr, {})  # Reset the attribute
+                display_mesh = getattr(self, display_attr)
+                if display_mesh:
+                    self.plotter.remove_actor(display_mesh)
+                    setattr(self, display_attr, None) # Reset the display attribute
+
+        # Remove o widget do layout
+        for i in range(self.files_info_container.count() - 1, -1, -1):
+            layout_item = self.files_info_container.itemAt(i)
+            if layout_item is None:
+                continue
+            widget = layout_item.widget()
+            if widget == file_item or remove_all:
+                # Remove o widget e o exclui
+                self.files_info_container.removeWidget(widget)
+                widget.deleteLater()
 
     def update_slider_value(self):
-        global Pan_X_value
-        global Pan_Y_value
-        global Pan_Z_value
+        delta_x = self.offset_x - self.panX.value()
+        delta_y = self.offset_y - self.panY.value()
+        delta_z = self.offset_z - self.panZ.value()
 
-        delta_X = Pan_X_value - self.Pan_X.value()
-        delta_Y = Pan_Y_value - self.Pan_Y.value()
-        delta_Z = Pan_Z_value - self.Pan_Z.value()
-        Pan_X_value = self.Pan_X.value()
-        Pan_Y_value = self.Pan_Y.value()
-        Pan_Z_value = self.Pan_Z.value()
-        self.mesh_scanned.translate([delta_X, delta_Y, delta_Z], inplace=True)
+        self.offset_x = self.panX.value()
+        self.offset_y = self.panY.value()
+        self.offset_z = self.panZ.value()
+
+        self.scanned_file_info['mesh_scanned'].translate([delta_x, delta_y, delta_z], inplace=True)
 
     def update_dial_value(self):
-        global Orbit_Z_value
-        delta_Z = Orbit_Z_value - self.Orbit_Z.value()
-        Orbit_Z_value = self.Orbit_Z.value()
-        self.mesh_scanned = rotate_mesh(self.mesh_scanned, 0, 0, delta_Z, True)
+        if 'mesh_scanned' in self.scanned_file_info:
+            delta_z = self.rotation_angle - self.orbitZ.value()
+            self.rotation_angle = self.orbitZ.value()
+            self.scanned_file_info['mesh_scanned'] = rotate_mesh(self.scanned_file_info['mesh_scanned'], 0, 0, delta_z, True)
 
-    def load_models(self):
+    def load_scan_model(self):
 
-        self.window_loading = LOADING()
+        # Starting the loading component
+        self.window_loading = loading()
         self.window_loading.show()
-        fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
-        self.mesh_scanned = pv.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
-        self.mesh_scanned = esphere_filt(self.mesh_scanned.points, 2)
+
+        # Getting file name
+        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO', "", '*.stl') # pylint: disable=undefined-variable
+
+        # Reading and filtering file
+        mesh_scanned = pv.read(file_path)
+        mesh_scanned = esphere_filt(mesh_scanned.points, 2)
+
         # Remaking surface
-        self.mesh_scanned = pv.wrap(self.mesh_scanned).reconstruct_surface() # type: ignore
+        self.scanned_file_info = {
+            'mesh_scanned': pv.wrap(mesh_scanned).reconstruct_surface(), # type: ignore
+            'file_path': file_path,
+            'file_name': os.path.basename(file_path),
+            'description': 'Escaneado'
+        }
 
-        # Exibe o arquivo SCANNED_FILE_PATH no gráfico 3D
-        self.plotter.add_mesh(self.mesh_scanned, color="lightblue", label="Scanned")
-
-        # Mostrar a grade e os eixos
-        self.plotter.add_axes()
-
-        # Ajustar a câmera para se ajustar aos modelos
+        # Generating 3D plot
+        self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh_scanned'], color="lightblue", label="Scanned")
         self.plotter.reset_camera()
+
+        self.build_files_list()
+
+        # Interrupting the loading component
         self.window_loading.close()
 
     def load_bases(self):
 
-        self.window_loading = LOADING()
+        # Starting the loading component
+        self.window_loading = loading()
         self.window_loading.show()
-        fname = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO',"",'*.stl')
-        self.mesh_parametric = pv.read(fname[0])  # Lê o arquivo STL do SCANNED_FILE_PATH
 
-        # Exibe o arquivo PARAMETRIC_INSOLE_FILE_PATH no gráfico 3D
-        self.plotter.add_mesh(self.mesh_parametric, color="orange", label="Parametric Insole")
+        # Getting file name
+        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO DA PALMILHA',"",'*.stl') # pylint: disable=undefined-variable
+        param_insole_mesh = pv.read(file_path)  # Lê o arquivo STL do SCANNED_FILE_PATH
 
-        # Mostrar a grade e os eixos
-        self.plotter.add_axes()
+        self.base_insole_file_info = {
+            'mesh_scanned': param_insole_mesh,
+            'file_path': file_path,
+            'file_name': os.path.basename(file_path),
+            'description': 'Palmilha Base'
+        }
 
-        # Ajustar a câmera para se ajustar aos modelos
+        # Remaking surface
+        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
         self.plotter.reset_camera()
+
+        self.build_files_list()
+
+        # Interrupting the loading component
         self.window_loading.close()
 
     def update_plotter(self):
-        """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""       
+        """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
         self.plotter.clear_actors()  # Limpa o gráfico atual
         # Repinta os dois modelos no gráfico
-        self.plotter.add_mesh(self.result, color="lightblue", label="Resultado")
+        self.plotter.add_mesh(self.insole_output, color="lightblue", label="Resultado")
         self.plotter.update()  # Atualiza o gráfico sem perder as configurações de exibição
 
     def cut_insole(self):
         result_1 = self.mesh_parametric.boolean_difference(self.mesh_scanned)
         result_2 = self.mesh_parametric.boolean_intersection(self.mesh_scanned)
 
-        if (result_1.volume>result_2.volume):
-            self.result=result_1
+        if result_1.volume > result_2.volume:
+            self.insole_output = result_1
         else:
-            self.result=result_2
+            self.insole_output = result_2
 
         self.update_plotter()
 
-    def TOPO_VIEW(self):
-        self.plotter.camera_position = [
-            (0, 0, 1),  # Posição da câmera (em Z positivo)
-            (0, 0, 0),  # Ponto focal (olhando para a origem)
-            (0, 1, 0)   # Vetor "up" (eixo Z positivo aponta para cima)
-        ]
+    def set_camera_view(self, view):
+        views = {
+            "top": [(0, 0, 1), (0, 0, 0), (0, 1, 0)],
+            "lateral": [(1, 0, 0), (0, 0, 0), (0, 0, 1)],
+            "front": [(0, 1, 0), (0, 0, 0), (0, 0, 1)]
+        }
+
+        position, focal, up = views[view]
+        self.plotter.camera_position = [position, focal, up]
         self.plotter.reset_camera()
 
-    def LATERAL_VIEW(self):
-        self.plotter.camera_position = [
-            (1, 0, 0),  # Posição da câmera (em X positivo)
-            (0, 0, 0),  # Ponto focal (olhando para a origem)
-            (0, 0, 1)   # Vetor "up" (eixo Z positivo aponta para cima)
-        ]
-        self.plotter.reset_camera()
-
-    def FRONT_VIEW(self):
-        self.plotter.camera_position = [
-            (0, 1, 0),  # Posição da câmera (em Y positivo)
-            (0, 0, 0),  # Ponto focal (olhando para a origem)
-            (0, 0, 1)   # Vetor "up" (eixo Z positivo aponta para cima)
-        ]
-        self.plotter.reset_camera()
-
-    def CLEAN_ALL(self):
-        self.plotter.clear_actors()  # Limpa o gráfico atual
+    def clean_plot(self):
+        self.remove_file_item(remove_all=True)
 
 
-class LOADING(QtWidgets.QDialog):
+class loading(QtWidgets.QDialog):
     def __init__(self):
-        super(LOADING, self).__init__()
-        # Carregar a interface criada no Qt Designer
+        super().__init__()
+        # Loading interface developed in Qt Designer
         uic.loadUi(r"QT_DESIGN\loading.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
-
 
 
 
