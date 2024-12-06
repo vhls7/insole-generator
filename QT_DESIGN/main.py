@@ -6,7 +6,7 @@ import sys
 import numpy as np
 import pyvista as pv
 import resources_rc
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtCore, QtGui
 from PyQt5.QtCore import Qt  # pylint: disable=no-name-in-module
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -163,6 +163,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if child.widget():
                 child.widget().deleteLater()
 
+        if self.scanned_file_info or self.base_insole_file_info:
+            self.create_selected_files_header()
+
+
         for file_info in (self.scanned_file_info, self.base_insole_file_info):
             if not file_info:
                 continue
@@ -175,20 +179,54 @@ class MainWindow(QtWidgets.QMainWindow):
             item_hlayout = QtWidgets.QHBoxLayout(selec_file_container)
 
             file_label = QtWidgets.QLabel(file_name)
+            file_label.setStyleSheet("font-size: 14px; font-weight: bold; color: black;")
             item_hlayout.addWidget(file_label)
 
             description_label = QtWidgets.QLabel(file_info['description'])
+            description_label.setStyleSheet("font-size: 12px; color: gray; margin-left: 10px;")
             item_hlayout.addWidget(description_label)
 
             delete_button = QtWidgets.QPushButton()
-            delete_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_TrashIcon))
-
+            delete_button.setIcon(QtGui.QIcon("QT_DESIGN/resources/icons/trash-can-solid.svg"))
+            delete_button.setStyleSheet(
+                """
+                QPushButton {
+                    background-color: #FF4D4D;  /* Cor de fundo do botão */
+                    border-radius: 10px;       /* Bordas arredondadas */
+                    padding: 5px;             /* Espaçamento interno */
+                }
+                QPushButton:hover {
+                    background-color: #FF3333;  /* Cor ao passar o mouse */
+                }
+                """
+            )
+            delete_button.setFixedSize(30, 30)
             # Usar lambda com parâmetro fixado para evitar erro de referência tardia
             delete_button.clicked.connect(lambda _, item=selec_file_container, name=file_name: self.remove_file_item(item, name))
             item_hlayout.addWidget(delete_button)
 
             # Adding the frame to the vBox container
             self.files_info_container.addWidget(selec_file_container)
+
+    def create_selected_files_header(self):
+        title_label = QtWidgets.QLabel("Arquivos Carregados")
+        title_label.setAlignment(QtCore.Qt.AlignCenter)
+        title_label.setStyleSheet(
+            """
+            QLabel {
+                background-color: qlineargradient(
+                    spread: pad, x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 #007BFF, stop: 1 #00C6FF
+                );
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 8px;
+                border-radius: 10px;
+            }
+            """
+        )
+        self.files_info_container.addWidget(title_label)
 
     def remove_file_item(self, file_item=None, file_name='', remove_all=False):
         # Removing selected file
