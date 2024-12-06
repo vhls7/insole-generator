@@ -8,6 +8,7 @@ import pyvista as pv
 import resources_rc
 from PyQt5 import QtWidgets, uic, QtCore, QtGui
 from PyQt5.QtCore import Qt  # pylint: disable=no-name-in-module
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from pyvistaqt import QtInteractor
@@ -91,6 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.window_loading = None
+        self.window_selectBase = None
 
         self.scanned_file_info = {}
         self.scanned_mesh_display = None
@@ -303,28 +305,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_bases(self):
 
         # Starting the loading component
-        self.window_loading = loading()
-        self.window_loading.show()
+        self.window_loading_bases = selectBases()
+        #self.window_loading = loading()
+        self.window_loading_bases.closed_signal.connect(self.on_window_loading_bases_closed)
+        self.window_loading_bases.show()
 
-        # Getting file name
-        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO DA PALMILHA',"",'*.stl') # pylint: disable=undefined-variable
-        param_insole_mesh = pv.read(file_path)  # Lê o arquivo STL do SCANNED_FILE_PATH
 
-        self.base_insole_file_info = {
-            'mesh_scanned': param_insole_mesh,
-            'file_path': file_path,
-            'file_name': os.path.basename(file_path),
-            'description': 'Palmilha Base'
-        }
-
-        # Remaking surface
-        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
-        self.plotter.reset_camera()
-
-        self.build_files_list()
-
-        # Interrupting the loading component
-        self.window_loading.close()
 
     def update_plotter(self):
         """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
@@ -358,6 +344,41 @@ class MainWindow(QtWidgets.QMainWindow):
     def clean_plot(self):
         self.remove_file_item(remove_all=True)
 
+    def on_window_loading_bases_closed(self, message):
+        # Esta função será chamada quando a segunda janela for fechada
+
+        base_name = os.path.join(r'palmilhas',message )
+        print(base_name)       
+
+        # Verificar se o arquivo existe
+        if os.path.exists(base_name):
+            print("Arquivo STL carregado com sucesso.")
+        else:
+            print("Arquivo não encontrado.")
+
+        #message=r'palmilhas\43\CONTATO_5_5.STL'
+        
+        
+        # Getting file name
+        #file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO DA PALMILHA',"",'*.stl') # pylint: disable=undefined-variable
+        param_insole_mesh = pv.read(base_name)  # Lê o arquivo STL do SCANNED_FILE_PATH
+
+        self.base_insole_file_info = {
+            'mesh_scanned': param_insole_mesh,
+            'file_path': base_name,
+            'file_name': os.path.basename('BASE'),
+            'description': 'Palmilha Base'
+        }
+
+        # Remaking surface
+        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
+        self.plotter.reset_camera()
+
+        self.build_files_list()
+
+        # Interrupting the loading component
+        #self.window_loading.close()
+
 
 class loading(QtWidgets.QDialog):
     def __init__(self):
@@ -365,6 +386,46 @@ class loading(QtWidgets.QDialog):
         # Loading interface developed in Qt Designer
         uic.loadUi(r"loading.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
+
+class selectBases(QtWidgets.QMainWindow):
+    base_name=''
+    closed_signal = pyqtSignal(str)
+    flag_insert='false'
+    def __init__(self):
+        super().__init__()
+        # Loading interface developed in Qt Designer
+        uic.loadUi(r"select_base.ui", self)
+        #self.setWindowFlags(Qt.FramelessWindowHint)
+        
+        # region Connecting buttons to functions
+        inserir_base = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
+        inserir_base.clicked.connect(self.load_base_padrao)
+
+    def closeEvent(self, event):
+        # Emite o sinal ao fechar a janela, passando a string desejada
+        if(self.flag_insert=='true'):
+            self.closed_signal.emit(self.base_name)
+        event.accept()
+
+    def load_base_padrao(self):
+        cb_numeracao = self.findChild(QtWidgets.QComboBox, "CB_numeracao")
+        cb_espessura = self.findChild(QtWidgets.QComboBox, "CB_espessura")
+        cb_altura = self.findChild(QtWidgets.QComboBox, "CB_calcanhar")
+        num=cb_numeracao.currentText()
+        esp=cb_espessura.currentText()
+        alt=cb_altura.currentText()
+        if(num == 'Escolha uma opção'):
+            num=0
+        if(esp == 'Escolha uma opção'):
+            esp=0
+        if(alt == 'Escolha uma opção'):
+            alt=0
+        
+        self.base_name=num+'\\CONTATO_'+esp+'_'+alt+'.STL'
+        self.flag_insert='true'
+
+        self.close()
+        
 
 
 
