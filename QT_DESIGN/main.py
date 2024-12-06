@@ -101,7 +101,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.insole_output = None
 
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"QT_DESIGN\main.ui", self)
+        uic.loadUi(r"main.ui", self)
 
         self.rotation_angle = 0
         self.offset_x = 0
@@ -363,7 +363,7 @@ class loading(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"QT_DESIGN\loading.ui", self)
+        uic.loadUi(r"loading.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
 
 
