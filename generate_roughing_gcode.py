@@ -92,7 +92,7 @@ if __name__ == "__main__":
     }
 
     g_code = RoughingGCodeGenerator(INSOLE_FILE_PATH, CONFIG).generate_gcode()
-    with open("gcode_desbaste.txt", "w") as file:
+    with open("gcode_desbaste.txt", "w", encoding='utf8') as file:
         file.write(g_code)
 
 

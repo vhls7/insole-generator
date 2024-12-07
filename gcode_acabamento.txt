@@ -1119,4 +1119,5 @@ G1 X41.645 Y42.999 Z6.000   ; Linear move
 G1 X90.645 Y42.999 Z6.000   ; Linear move
 G1 X72.645 Y44.999 Z6.000   ; Linear move
 G0 Z36         ; Move to safe height
+M5; Stop spindle
 M30 ; Program end

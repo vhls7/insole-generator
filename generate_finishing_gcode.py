@@ -47,7 +47,6 @@ class FinishingGCodeGenerator:
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
         self.path_points = self.get_path_points(self.insole_proc)
-        print(self.generate_gcode())
 
     def get_path_points(self, insole_obj):
         z = self.config['safe_z']
@@ -131,10 +130,11 @@ class FinishingGCodeGenerator:
 
         gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
 
+        gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
 
-        with open('gcode.txt', 'w') as file:
-            file.write("\n".join(gcode))
+        return "\n".join(gcode)
+
 
 
 if __name__ == "__main__":
@@ -154,5 +154,6 @@ if __name__ == "__main__":
         'only_contour_height': 0.1
     }
 
-    g_code = FinishingGCodeGenerator(INSOLE_FILE_PATH, CONFIG)
-    print(g_code)
+    g_code = FinishingGCodeGenerator(INSOLE_FILE_PATH, CONFIG).generate_gcode()
+    with open("gcode_acabamento.txt", "w", encoding='utf8') as file:
+        file.write(g_code)
