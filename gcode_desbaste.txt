@@ -1,0 +1,343 @@
+G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin
+G21            ; Set units to millimeters
+G49            ; Cancel any tool offset that might be active
+G0 Z36         ; Move to safe height
+M3 S15000      ; Start spindle rotation clockwise (M3) at 15000 RPM
+G0 X-24.355 Y-42.001        ; Rapid positioning to start of path
+G1 Z28.791        ; Set depth to 28.791
+G1 X54.645 Y-42.001        ; Linear move
+G1 X68.645 Y-39.001        ; Linear move
+G1 X-100.355 Y-39.001        ; Linear move
+G1 X-107.355 Y-36.001        ; Linear move
+G1 X80.645 Y-36.001        ; Linear move
+G1 X88.645 Y-33.001        ; Linear move
+G1 X-111.355 Y-33.001        ; Linear move
+G1 X-115.355 Y-30.001        ; Linear move
+G1 X94.645 Y-30.001        ; Linear move
+G1 X99.645 Y-27.001        ; Linear move
+G1 X-117.355 Y-27.001        ; Linear move
+G1 X-119.355 Y-24.001        ; Linear move
+G1 X103.645 Y-24.001        ; Linear move
+G1 X107.645 Y-21.001        ; Linear move
+G1 X-121.355 Y-21.001        ; Linear move
+G1 X-122.355 Y-18.001        ; Linear move
+G1 X110.645 Y-18.001        ; Linear move
+G1 X113.645 Y-15.001        ; Linear move
+G1 X-123.355 Y-15.001        ; Linear move
+G1 X-124.355 Y-12.001        ; Linear move
+G1 X115.645 Y-12.001        ; Linear move
+G1 X117.645 Y-9.001        ; Linear move
+G1 X-124.355 Y-9.001        ; Linear move
+G1 X-124.355 Y-6.001        ; Linear move
+G1 X119.645 Y-6.001        ; Linear move
+G1 X121.645 Y-3.001        ; Linear move
+G1 X-124.355 Y-3.001        ; Linear move
+G1 X-124.355 Y-0.001        ; Linear move
+G1 X122.645 Y-0.001        ; Linear move
+G1 X123.645 Y2.999        ; Linear move
+G1 X-123.355 Y2.999        ; Linear move
+G1 X-122.355 Y5.999        ; Linear move
+G1 X124.645 Y5.999        ; Linear move
+G1 X124.645 Y8.999        ; Linear move
+G1 X-121.355 Y8.999        ; Linear move
+G1 X-120.355 Y11.999        ; Linear move
+G1 X124.645 Y11.999        ; Linear move
+G1 X123.645 Y14.999        ; Linear move
+G1 X-118.355 Y14.999        ; Linear move
+G1 X-115.355 Y17.999        ; Linear move
+G1 X122.645 Y17.999        ; Linear move
+G1 X121.645 Y20.999        ; Linear move
+G1 X-112.355 Y20.999        ; Linear move
+G1 X-107.355 Y23.999        ; Linear move
+G1 X119.645 Y23.999        ; Linear move
+G1 X117.645 Y26.999        ; Linear move
+G1 X-100.355 Y26.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-34.355 Y29.999        ; Rapid positioning to start of path
+G1 Z28.791        ; Set depth to 28.791
+G1 X114.645 Y29.999        ; Linear move
+G1 X110.645 Y32.999        ; Linear move
+G1 X-12.355 Y32.999        ; Linear move
+G1 X3.645 Y35.999        ; Linear move
+G1 X106.645 Y35.999        ; Linear move
+G1 X101.645 Y38.999        ; Linear move
+G1 X17.645 Y38.999        ; Linear move
+G1 X34.645 Y41.999        ; Linear move
+G1 X93.645 Y41.999        ; Linear move
+G1 X72.645 Y44.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-24.355 Y-42.001        ; Rapid positioning to start of path
+G1 Z23.582        ; Set depth to 23.582
+G1 X54.645 Y-42.001        ; Linear move
+G1 X68.645 Y-39.001        ; Linear move
+G1 X-100.355 Y-39.001        ; Linear move
+G1 X-107.355 Y-36.001        ; Linear move
+G1 X80.645 Y-36.001        ; Linear move
+G1 X88.645 Y-33.001        ; Linear move
+G1 X-111.355 Y-33.001        ; Linear move
+G1 X-115.355 Y-30.001        ; Linear move
+G1 X94.645 Y-30.001        ; Linear move
+G1 X99.645 Y-27.001        ; Linear move
+G1 X-117.355 Y-27.001        ; Linear move
+G1 X-119.355 Y-24.001        ; Linear move
+G1 X103.645 Y-24.001        ; Linear move
+G1 X107.645 Y-21.001        ; Linear move
+G1 X-121.355 Y-21.001        ; Linear move
+G1 X-122.355 Y-18.001        ; Linear move
+G1 X110.645 Y-18.001        ; Linear move
+G1 X113.645 Y-15.001        ; Linear move
+G1 X-123.355 Y-15.001        ; Linear move
+G1 X-124.355 Y-12.001        ; Linear move
+G1 X115.645 Y-12.001        ; Linear move
+G1 X117.645 Y-9.001        ; Linear move
+G1 X-124.355 Y-9.001        ; Linear move
+G1 X-124.355 Y-6.001        ; Linear move
+G1 X119.645 Y-6.001        ; Linear move
+G1 X121.645 Y-3.001        ; Linear move
+G1 X-124.355 Y-3.001        ; Linear move
+G1 X-124.355 Y-0.001        ; Linear move
+G1 X122.645 Y-0.001        ; Linear move
+G1 X123.645 Y2.999        ; Linear move
+G1 X-123.355 Y2.999        ; Linear move
+G1 X-122.355 Y5.999        ; Linear move
+G1 X124.645 Y5.999        ; Linear move
+G1 X124.645 Y8.999        ; Linear move
+G1 X-121.355 Y8.999        ; Linear move
+G1 X-120.355 Y11.999        ; Linear move
+G1 X124.645 Y11.999        ; Linear move
+G1 X123.645 Y14.999        ; Linear move
+G1 X-118.355 Y14.999        ; Linear move
+G1 X-115.355 Y17.999        ; Linear move
+G1 X122.645 Y17.999        ; Linear move
+G1 X121.645 Y20.999        ; Linear move
+G1 X-112.355 Y20.999        ; Linear move
+G1 X-107.355 Y23.999        ; Linear move
+G1 X119.645 Y23.999        ; Linear move
+G1 X117.645 Y26.999        ; Linear move
+G1 X-100.355 Y26.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-34.355 Y29.999        ; Rapid positioning to start of path
+G1 Z23.582        ; Set depth to 23.582
+G1 X114.645 Y29.999        ; Linear move
+G1 X110.645 Y32.999        ; Linear move
+G1 X-12.355 Y32.999        ; Linear move
+G1 X3.645 Y35.999        ; Linear move
+G1 X106.645 Y35.999        ; Linear move
+G1 X101.645 Y38.999        ; Linear move
+G1 X17.645 Y38.999        ; Linear move
+G1 X34.645 Y41.999        ; Linear move
+G1 X93.645 Y41.999        ; Linear move
+G1 X72.645 Y44.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-24.355 Y-42.001        ; Rapid positioning to start of path
+G1 Z18.374        ; Set depth to 18.374
+G1 X54.645 Y-42.001        ; Linear move
+G1 X68.645 Y-39.001        ; Linear move
+G1 X-100.355 Y-39.001        ; Linear move
+G1 X-107.355 Y-36.001        ; Linear move
+G1 X80.645 Y-36.001        ; Linear move
+G1 X88.645 Y-33.001        ; Linear move
+G1 X-111.355 Y-33.001        ; Linear move
+G1 X-115.355 Y-30.001        ; Linear move
+G1 X94.645 Y-30.001        ; Linear move
+G1 X99.645 Y-27.001        ; Linear move
+G1 X-117.355 Y-27.001        ; Linear move
+G1 X-119.355 Y-24.001        ; Linear move
+G1 X103.645 Y-24.001        ; Linear move
+G1 X107.645 Y-21.001        ; Linear move
+G1 X-121.355 Y-21.001        ; Linear move
+G1 X-122.355 Y-18.001        ; Linear move
+G1 X110.645 Y-18.001        ; Linear move
+G1 X113.645 Y-15.001        ; Linear move
+G1 X-123.355 Y-15.001        ; Linear move
+G1 X-124.355 Y-12.001        ; Linear move
+G1 X115.645 Y-12.001        ; Linear move
+G1 X117.645 Y-9.001        ; Linear move
+G1 X-124.355 Y-9.001        ; Linear move
+G1 X-124.355 Y-6.001        ; Linear move
+G1 X119.645 Y-6.001        ; Linear move
+G1 X121.645 Y-3.001        ; Linear move
+G1 X-124.355 Y-3.001        ; Linear move
+G1 X-124.355 Y-0.001        ; Linear move
+G1 X122.645 Y-0.001        ; Linear move
+G1 X123.645 Y2.999        ; Linear move
+G1 X-123.355 Y2.999        ; Linear move
+G1 X-122.355 Y5.999        ; Linear move
+G1 X124.645 Y5.999        ; Linear move
+G1 X124.645 Y8.999        ; Linear move
+G1 X-121.355 Y8.999        ; Linear move
+G1 X-120.355 Y11.999        ; Linear move
+G1 X124.645 Y11.999        ; Linear move
+G1 X123.645 Y14.999        ; Linear move
+G1 X-118.355 Y14.999        ; Linear move
+G1 X-115.355 Y17.999        ; Linear move
+G1 X122.645 Y17.999        ; Linear move
+G1 X121.645 Y20.999        ; Linear move
+G1 X-112.355 Y20.999        ; Linear move
+G1 X-107.355 Y23.999        ; Linear move
+G1 X119.645 Y23.999        ; Linear move
+G1 X117.645 Y26.999        ; Linear move
+G1 X-100.355 Y26.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-34.355 Y29.999        ; Rapid positioning to start of path
+G1 Z18.374        ; Set depth to 18.374
+G1 X114.645 Y29.999        ; Linear move
+G1 X110.645 Y32.999        ; Linear move
+G1 X-12.355 Y32.999        ; Linear move
+G1 X3.645 Y35.999        ; Linear move
+G1 X106.645 Y35.999        ; Linear move
+G1 X101.645 Y38.999        ; Linear move
+G1 X17.645 Y38.999        ; Linear move
+G1 X34.645 Y41.999        ; Linear move
+G1 X93.645 Y41.999        ; Linear move
+G1 X72.645 Y44.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-24.355 Y-42.001        ; Rapid positioning to start of path
+G1 Z13.165        ; Set depth to 13.165
+G1 X54.645 Y-42.001        ; Linear move
+G1 X68.645 Y-39.001        ; Linear move
+G1 X-100.355 Y-39.001        ; Linear move
+G1 X-107.355 Y-36.001        ; Linear move
+G1 X80.645 Y-36.001        ; Linear move
+G1 X88.645 Y-33.001        ; Linear move
+G1 X-111.355 Y-33.001        ; Linear move
+G1 X-115.355 Y-30.001        ; Linear move
+G1 X94.645 Y-30.001        ; Linear move
+G1 X99.645 Y-27.001        ; Linear move
+G1 X-117.355 Y-27.001        ; Linear move
+G1 X-119.355 Y-24.001        ; Linear move
+G1 X103.645 Y-24.001        ; Linear move
+G1 X107.645 Y-21.001        ; Linear move
+G1 X-121.355 Y-21.001        ; Linear move
+G1 X-122.355 Y-18.001        ; Linear move
+G1 X110.645 Y-18.001        ; Linear move
+G1 X113.645 Y-15.001        ; Linear move
+G1 X-123.355 Y-15.001        ; Linear move
+G1 X-124.355 Y-12.001        ; Linear move
+G1 X115.645 Y-12.001        ; Linear move
+G1 X117.645 Y-9.001        ; Linear move
+G1 X-124.355 Y-9.001        ; Linear move
+G1 X-124.355 Y-6.001        ; Linear move
+G1 X119.645 Y-6.001        ; Linear move
+G1 X121.645 Y-3.001        ; Linear move
+G1 X-124.355 Y-3.001        ; Linear move
+G1 X-124.355 Y-0.001        ; Linear move
+G1 X122.645 Y-0.001        ; Linear move
+G1 X123.645 Y2.999        ; Linear move
+G1 X-123.355 Y2.999        ; Linear move
+G1 X-122.355 Y5.999        ; Linear move
+G1 X124.645 Y5.999        ; Linear move
+G1 X124.645 Y8.999        ; Linear move
+G1 X-121.355 Y8.999        ; Linear move
+G1 X-120.355 Y11.999        ; Linear move
+G1 X124.645 Y11.999        ; Linear move
+G1 X123.645 Y14.999        ; Linear move
+G1 X-118.355 Y14.999        ; Linear move
+G1 X-115.355 Y17.999        ; Linear move
+G1 X122.645 Y17.999        ; Linear move
+G1 X121.645 Y20.999        ; Linear move
+G1 X-112.355 Y20.999        ; Linear move
+G1 X-107.355 Y23.999        ; Linear move
+G1 X119.645 Y23.999        ; Linear move
+G1 X117.645 Y26.999        ; Linear move
+G1 X-100.355 Y26.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-34.355 Y29.999        ; Rapid positioning to start of path
+G1 Z13.165        ; Set depth to 13.165
+G1 X114.645 Y29.999        ; Linear move
+G1 X110.645 Y32.999        ; Linear move
+G1 X-12.355 Y32.999        ; Linear move
+G1 X3.645 Y35.999        ; Linear move
+G1 X106.645 Y35.999        ; Linear move
+G1 X101.645 Y38.999        ; Linear move
+G1 X17.645 Y38.999        ; Linear move
+G1 X34.645 Y41.999        ; Linear move
+G1 X93.645 Y41.999        ; Linear move
+G1 X72.645 Y44.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-24.355 Y-42.001        ; Rapid positioning to start of path
+G1 Z7.956        ; Set depth to 7.956
+G1 X54.645 Y-42.001        ; Linear move
+G1 X68.645 Y-39.001        ; Linear move
+G1 X-100.355 Y-39.001        ; Linear move
+G1 X-107.355 Y-36.001        ; Linear move
+G1 X80.645 Y-36.001        ; Linear move
+G1 X88.645 Y-33.001        ; Linear move
+G1 X-111.355 Y-33.001        ; Linear move
+G1 X-115.355 Y-30.001        ; Linear move
+G1 X94.645 Y-30.001        ; Linear move
+G1 X99.645 Y-27.001        ; Linear move
+G1 X-117.355 Y-27.001        ; Linear move
+G1 X-119.355 Y-24.001        ; Linear move
+G1 X103.645 Y-24.001        ; Linear move
+G1 X107.645 Y-21.001        ; Linear move
+G1 X-121.355 Y-21.001        ; Linear move
+G1 X-122.355 Y-18.001        ; Linear move
+G1 X110.645 Y-18.001        ; Linear move
+G1 X113.645 Y-15.001        ; Linear move
+G1 X-123.355 Y-15.001        ; Linear move
+G1 X-124.355 Y-12.001        ; Linear move
+G1 X115.645 Y-12.001        ; Linear move
+G1 X117.645 Y-9.001        ; Linear move
+G1 X-124.355 Y-9.001        ; Linear move
+G1 X-124.355 Y-6.001        ; Linear move
+G1 X119.645 Y-6.001        ; Linear move
+G1 X121.645 Y-3.001        ; Linear move
+G1 X-124.355 Y-3.001        ; Linear move
+G1 X-124.355 Y-0.001        ; Linear move
+G1 X122.645 Y-0.001        ; Linear move
+G1 X123.645 Y2.999        ; Linear move
+G1 X-123.355 Y2.999        ; Linear move
+G1 X-122.355 Y5.999        ; Linear move
+G1 X124.645 Y5.999        ; Linear move
+G1 X124.645 Y8.999        ; Linear move
+G1 X-121.355 Y8.999        ; Linear move
+G1 X-120.355 Y11.999        ; Linear move
+G1 X124.645 Y11.999        ; Linear move
+G1 X123.645 Y14.999        ; Linear move
+G1 X-118.355 Y14.999        ; Linear move
+G1 X-115.355 Y17.999        ; Linear move
+G1 X122.645 Y17.999        ; Linear move
+G1 X121.645 Y20.999        ; Linear move
+G1 X-112.355 Y20.999        ; Linear move
+G1 X-107.355 Y23.999        ; Linear move
+G1 X119.645 Y23.999        ; Linear move
+G1 X117.645 Y26.999        ; Linear move
+G1 X-100.355 Y26.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-34.355 Y29.999        ; Rapid positioning to start of path
+G1 Z7.956        ; Set depth to 7.956
+G1 X114.645 Y29.999        ; Linear move
+G1 X110.645 Y32.999        ; Linear move
+G1 X-12.355 Y32.999        ; Linear move
+G1 X3.645 Y35.999        ; Linear move
+G1 X106.645 Y35.999        ; Linear move
+G1 X101.645 Y38.999        ; Linear move
+G1 X17.645 Y38.999        ; Linear move
+G1 X34.645 Y41.999        ; Linear move
+G1 X93.645 Y41.999        ; Linear move
+G1 X72.645 Y44.999        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X-70.355 Y-21.001        ; Rapid positioning to start of path
+G1 Z2.747        ; Set depth to 2.747
+G1 X-60.355 Y-21.001        ; Linear move
+G1 X-57.355 Y-18.001        ; Linear move
+G1 X-72.355 Y-18.001        ; Linear move
+G1 X-72.355 Y-15.001        ; Linear move
+G1 X-56.355 Y-15.001        ; Linear move
+G1 X-58.355 Y-12.001        ; Linear move
+G1 X-70.355 Y-12.001        ; Linear move
+G0 Z36         ; Move to safe height
+G0 X54.645 Y-18.001        ; Rapid positioning to start of path
+G1 Z2.747        ; Set depth to 2.747
+G1 X60.645 Y-15.001        ; Linear move
+G1 X51.645 Y-15.001        ; Linear move
+G1 X52.645 Y-12.001        ; Linear move
+G1 X63.645 Y-12.001        ; Linear move
+G1 X64.645 Y-9.001        ; Linear move
+G1 X56.645 Y-9.001        ; Linear move
+G1 X62.645 Y-6.001        ; Linear move
+G1 X64.645 Y-6.001        ; Linear move
+G0 Z36         ; Move to safe height
+M5; Stop spindle
+M30 ; Program end

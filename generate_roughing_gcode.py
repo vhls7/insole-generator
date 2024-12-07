@@ -70,6 +70,7 @@ class RoughingGCodeGenerator:
 
                 gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
 
+        gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
         return "\n".join(gcode)
 
@@ -91,7 +92,8 @@ if __name__ == "__main__":
     }
 
     g_code = RoughingGCodeGenerator(INSOLE_FILE_PATH, CONFIG).generate_gcode()
-    print(g_code)
+    with open("gcode_desbaste.txt", "w") as file:
+        file.write(g_code)
 
 
 # # region Plotting the result
