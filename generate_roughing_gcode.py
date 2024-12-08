@@ -8,6 +8,8 @@ class RoughingGCodeGenerator:
     def __init__(self, insole_file_path, config):
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
+        self.insole_proc.mesh.translate([0, 0, -self.config['block_height']], inplace=True)
+        self.only_contour_height = self.config['only_contour_height'] - self.config['block_height']
         self.levels = self.get_levels()
         self.g_code = self.generate_gcode()
 
@@ -18,7 +20,7 @@ class RoughingGCodeGenerator:
             self.insole_proc,
             self.config['raster_step'],
             self.config['step_over'],
-            self.config['only_contour_height']
+            self.only_contour_height
         ).get_paths()
 
         z_levels = self.get_z_levels(min_z)
@@ -41,9 +43,9 @@ class RoughingGCodeGenerator:
         return levels
 
     def get_z_levels(self, min_z):
-        delta_z = self.config['block_height'] - min_z
+        delta_z = 0 - min_z
         real_z_step = delta_z / self.config['z_step']
-        z_levels = np.arange(self.config['block_height'] - real_z_step, min_z - real_z_step, -real_z_step)
+        z_levels = np.arange(0 - real_z_step, min_z - real_z_step, -real_z_step)
         return z_levels
 
     def generate_gcode(self):
@@ -51,7 +53,7 @@ class RoughingGCodeGenerator:
             'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
             "G21            ; Set units to millimeters",
             'G49            ; Cancel any tool offset that might be active',
-            f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height",
+            f"G0 Z{self.config['safe_z']}         ; Move to safe height",
             f"M3 S{self.config['rotation_speed']}      ; Start spindle rotation clockwise (M3) at {self.config['rotation_speed']} RPM"
         ]
 
@@ -62,13 +64,13 @@ class RoughingGCodeGenerator:
             for path in paths:
                 x_start, y_start = path[0]
                 gcode.append(f"G0 X{x_start:.3f} Y{y_start:.3f}        ; Rapid positioning to start of path")
-                gcode.append(f"G1 Z{z - 34:.3f}        ; Set depth to {z - 34:.3f}")
+                gcode.append(f"G1 Z{z:.3f}        ; Set depth to {z:.3f}")
 
                 if len(path) > 1:
                     for x, y in path[1:]:
                         gcode.append(f"G1 X{x:.3f} Y{y:.3f}        ; Linear move")
 
-                gcode.append(f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height")
+                gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
 
         gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         'block_height': 34,
         'z_step': 6,
         'z_step_finish': 1,
-        'safe_z': 40,
+        'safe_z': 6,
         'rotation_speed': 13000,
         'only_contour_height': 0.1
     }
