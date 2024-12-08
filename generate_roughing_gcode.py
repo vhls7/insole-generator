@@ -51,7 +51,7 @@ class RoughingGCodeGenerator:
             'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
             "G21            ; Set units to millimeters",
             'G49            ; Cancel any tool offset that might be active',
-            f"G0 Z{self.config['safe_z']}         ; Move to safe height",
+            f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height",
             f"M3 S{self.config['rotation_speed']}      ; Start spindle rotation clockwise (M3) at {self.config['rotation_speed']} RPM"
         ]
 
@@ -62,13 +62,13 @@ class RoughingGCodeGenerator:
             for path in paths:
                 x_start, y_start = path[0]
                 gcode.append(f"G0 X{x_start:.3f} Y{y_start:.3f}        ; Rapid positioning to start of path")
-                gcode.append(f"G1 Z{z:.3f}        ; Set depth to {z:.3f}")
+                gcode.append(f"G1 Z{z - 34:.3f}        ; Set depth to {z - 34:.3f}")
 
                 if len(path) > 1:
                     for x, y in path[1:]:
                         gcode.append(f"G1 X{x:.3f} Y{y:.3f}        ; Linear move")
 
-                gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
+                gcode.append(f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height")
 
         gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
@@ -86,8 +86,8 @@ if __name__ == "__main__":
         'block_height': 34,
         'z_step': 6,
         'z_step_finish': 1,
-        'safe_z': 36,
-        'rotation_speed': 15000,
+        'safe_z': 40,
+        'rotation_speed': 13000,
         'only_contour_height': 0.1
     }
 

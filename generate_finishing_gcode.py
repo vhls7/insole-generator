@@ -120,15 +120,15 @@ class FinishingGCodeGenerator:
             'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
             "G21            ; Set units to millimeters",
             'G49            ; Cancel any tool offset that might be active',
-            f"G0 Z{self.config['safe_z']}         ; Move to safe height",
+            f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height",
             f"M3 S{self.config['rotation_speed']}      ; Start spindle rotation clockwise (M3) at {self.config['rotation_speed']} RPM"
         ]
 
 
         for x, y, z in self.path_points:
-            gcode.append(f"G1 X{x:.3f} Y{y:.3f} Z{z:.3f}   ; Linear move")
+            gcode.append(f"G1 X{x:.3f} Y{y:.3f} Z{z - 34:.3f}   ; Linear move")
 
-        gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
+        gcode.append(f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height")
 
         gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
@@ -145,12 +145,10 @@ if __name__ == "__main__":
     CONFIG = {
         'tool_radius': 3,
         'raster_step': 1,
-        'step_over': 3,
+        'step_over': 1,
         'block_height': 34,
-        'z_step': 6,
-        'z_step_finish': 1,
         'safe_z': 36,
-        'rotation_speed': 15000,
+        'rotation_speed': 13000,
         'only_contour_height': 0.1
     }
 
