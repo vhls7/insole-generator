@@ -5,10 +5,8 @@ import sys
 
 import numpy as np
 import pyvista as pv
-import resources_rc
-from PyQt5 import QtWidgets, uic, QtCore, QtGui
-from PyQt5.QtCore import Qt  # pylint: disable=no-name-in-module
-from PyQt5.QtCore import pyqtSignal
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5.QtCore import Qt, pyqtSignal  # pylint: disable=no-name-in-module
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from pyvistaqt import QtInteractor
@@ -40,39 +38,6 @@ def rotate_mesh(mesh: pv.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centr
 
     return mesh
 
-def get_centroid2(your_mesh):
-    bounds = your_mesh.bounds
-
-    # Calculate the centroid as the average of the min and max coordinates
-    centroid = np.array([
-        (bounds[0] + bounds[1]) / 2, # x
-        (bounds[2] + bounds[3]) / 2, # y
-        (bounds[4] + bounds[5]) / 2  # z
-    ])
-    return centroid
-
-def cut_mesh(mesh: pv.PolyData, axis, cut_value=0) -> pv.PolyData:
-    """Clip the mesh along a specified axis at a given cut value."""
-    bounds = mesh.bounds  # mesh.bounds returns [xmin, xmax, ymin, ymax, zmin, zmax]
-
-    if axis == 'x':
-        clip_bounds = [bounds[0], cut_value, bounds[2], bounds[3], bounds[4], bounds[5]]
-    elif axis == 'y':
-        clip_bounds = [bounds[0], bounds[1], bounds[2], cut_value, bounds[4], bounds[5]]
-    elif axis == 'z':
-        clip_bounds = [bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], cut_value]
-    else:
-        raise ValueError("Invalid axis. Choose between 'x', 'y', 'z'.")
-
-    # Clip the mesh with the computed bounds
-    cutted_mesh = mesh.clip_box(bounds=clip_bounds, invert=False)
-
-    if cutted_mesh is not None:
-        cutted_mesh = cutted_mesh.extract_surface()
-        if isinstance(cutted_mesh, pv.PolyData):
-            return cutted_mesh
-    raise TypeError("Error cutting the file")
-
 def esphere_filt(points, radius):
     remaining_points = points.copy()
     filtered_points = []
@@ -86,13 +51,11 @@ def esphere_filt(points, radius):
         remaining_points = remaining_points[distances > radius]
     return np.array(filtered_points)
 
-
-
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.window_loading = None
-        self.window_selectBase = None
+        self.window_select_base = None
 
         self.scanned_file_info = {}
         self.scanned_mesh_display = None
@@ -103,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.insole_output = None
 
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"main.ui", self)
+        uic.loadUi(r"QT_DESIGN\main.ui", self)
 
         self.rotation_angle = 0
         self.offset_x = 0
@@ -122,38 +85,27 @@ class MainWindow(QtWidgets.QMainWindow):
         pyvista_widget.setLayout(self.layout)
 
         # region Connecting buttons to functions
-        load_scan = self.findChild(QtWidgets.QPushButton, "loadScanButton")
-        load_scan.clicked.connect(self.load_scan_model)
+        self.findChild(QtWidgets.QPushButton, "loadScanButton").clicked.connect(self.load_scan_model)
 
-        load_base = self.findChild(QtWidgets.QPushButton, "loadBaseButton")
-        load_base.clicked.connect(self.load_bases)
+        self.findChild(QtWidgets.QPushButton, "loadBaseButton").clicked.connect(self.load_bases)
 
-        pan_x = self.findChild(QtWidgets.QSlider, "panX")
-        pan_x.valueChanged.connect(self.update_slider_value)
+        self.findChild(QtWidgets.QSlider, "panX").valueChanged.connect(self.update_slider_value)
 
-        pan_y = self.findChild(QtWidgets.QSlider, "panY")
-        pan_y.valueChanged.connect(self.update_slider_value)
+        self.findChild(QtWidgets.QSlider, "panY").valueChanged.connect(self.update_slider_value)
 
-        pan_z = self.findChild(QtWidgets.QSlider, "panZ")
-        pan_z.valueChanged.connect(self.update_slider_value)
+        self.findChild(QtWidgets.QSlider, "panZ").valueChanged.connect(self.update_slider_value)
 
-        orbit_z = self.findChild(QtWidgets.QDial, "orbitZ")
-        orbit_z.valueChanged.connect(self.update_dial_value)
+        self.findChild(QtWidgets.QDial, "orbitZ").valueChanged.connect(self.update_dial_value)
 
-        cut_but = self.findChild(QtWidgets.QPushButton, "cutButton")
-        cut_but.clicked.connect(self.cut_insole)
+        self.findChild(QtWidgets.QPushButton, "cutButton").clicked.connect(self.cut_insole)
 
-        top_cam = self.findChild(QtWidgets.QPushButton, "topCam")
-        top_cam.clicked.connect(lambda: self.set_camera_view('top'))
+        self.findChild(QtWidgets.QPushButton, "topCam").clicked.connect(lambda: self.set_camera_view('top'))
 
-        lat_cam = self.findChild(QtWidgets.QPushButton, "latCam")
-        lat_cam.clicked.connect(lambda: self.set_camera_view('lateral'))
+        self.findChild(QtWidgets.QPushButton, "latCam").clicked.connect(lambda: self.set_camera_view('lateral'))
 
-        front_cam = self.findChild(QtWidgets.QPushButton, "frontCam")
-        front_cam.clicked.connect(lambda: self.set_camera_view('front'))
+        self.findChild(QtWidgets.QPushButton, "frontCam").clicked.connect(lambda: self.set_camera_view('front'))
 
-        clean_but = self.findChild(QtWidgets.QPushButton, "cleanButton")
-        clean_but.clicked.connect(self.clean_plot)
+        self.findChild(QtWidgets.QPushButton, "cleanButton").clicked.connect(lambda: self.remove_file_item(remove_all=True))
 
         self.files_info_container = self.findChild(QtWidgets.QVBoxLayout, "filesInfoContainer")
         # endregion
@@ -188,27 +140,31 @@ class MainWindow(QtWidgets.QMainWindow):
             description_label.setStyleSheet("font-size: 12px; color: gray; margin-left: 10px;")
             item_hlayout.addWidget(description_label)
 
-            delete_button = QtWidgets.QPushButton()
-            delete_button.setIcon(QtGui.QIcon("QT_DESIGN/resources/icons/trash-can-solid.svg"))
-            delete_button.setStyleSheet(
-                """
-                QPushButton {
-                    background-color: #FF4D4D;  /* Cor de fundo do botão */
-                    border-radius: 10px;       /* Bordas arredondadas */
-                    padding: 5px;             /* Espaçamento interno */
-                }
-                QPushButton:hover {
-                    background-color: #FF3333;  /* Cor ao passar o mouse */
-                }
-                """
-            )
-            delete_button.setFixedSize(30, 30)
-            # Usar lambda com parâmetro fixado para evitar erro de referência tardia
-            delete_button.clicked.connect(lambda _, item=selec_file_container, name=file_name: self.remove_file_item(item, name))
+            delete_button = self.create_delete_button(file_name, selec_file_container)
             item_hlayout.addWidget(delete_button)
 
             # Adding the frame to the vBox container
             self.files_info_container.addWidget(selec_file_container)
+
+    def create_delete_button(self, file_name, container):
+        delete_button = QtWidgets.QPushButton()
+        delete_button.setIcon(QtGui.QIcon("QT_DESIGN/resources/icons/trash-can-solid.svg"))
+        delete_button.setStyleSheet(
+            """
+            QPushButton {
+                background-color: #FF4D4D;  /* Cor de fundo do botão */
+                border-radius: 10px;       /* Bordas arredondadas */
+                padding: 5px;             /* Espaçamento interno */
+            }
+            QPushButton:hover {
+                background-color: #FF3333;  /* Cor ao passar o mouse */
+            }
+            """
+        )
+        delete_button.setFixedSize(30, 30)
+        # Usar lambda com parâmetro fixado para evitar erro de referência tardia
+        delete_button.clicked.connect(lambda _, item=container, name=file_name: self.remove_file_item(item, name))
+        return delete_button
 
     def create_selected_files_header(self):
         title_label = QtWidgets.QLabel("Arquivos Carregados")
@@ -305,12 +261,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_bases(self):
 
         # Starting the loading component
-        self.window_loading_bases = selectBases()
+        self.window_loading_bases = SelectBases()
         #self.window_loading = loading()
         self.window_loading_bases.closed_signal.connect(self.on_window_loading_bases_closed)
         self.window_loading_bases.show()
-
-
 
     def update_plotter(self):
         """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
@@ -341,9 +295,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.camera_position = [position, focal, up]
         self.plotter.reset_camera()
 
-    def clean_plot(self):
-        self.remove_file_item(remove_all=True)
-
     def on_window_loading_bases_closed(self, message):
         # Esta função será chamada quando a segunda janela for fechada
 
@@ -356,9 +307,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             print("Arquivo não encontrado.")
 
-        #message=r'palmilhas\43\CONTATO_5_5.STL'
-        
-        
         # Getting file name
         #file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO DA PALMILHA',"",'*.stl') # pylint: disable=undefined-variable
         param_insole_mesh = pv.read(base_name)  # Lê o arquivo STL do SCANNED_FILE_PATH
@@ -376,34 +324,30 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.build_files_list()
 
-        # Interrupting the loading component
-        #self.window_loading.close()
-
 
 class loading(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"loading.ui", self)
+        uic.loadUi(r"QT_DESIGN\loading.ui", self)
         self.setWindowFlags(Qt.FramelessWindowHint)
 
-class selectBases(QtWidgets.QMainWindow):
+class SelectBases(QtWidgets.QMainWindow):
     base_name=''
     closed_signal = pyqtSignal(str)
     flag_insert='false'
     def __init__(self):
         super().__init__()
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"select_base.ui", self)
+        uic.loadUi(r"QT_DESIGN\select_base.ui", self)
         #self.setWindowFlags(Qt.FramelessWindowHint)
-        
-        # region Connecting buttons to functions
+
         inserir_base = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
         inserir_base.clicked.connect(self.load_base_padrao)
 
-    def closeEvent(self, event):
+    def close_event(self, event):
         # Emite o sinal ao fechar a janela, passando a string desejada
-        if(self.flag_insert=='true'):
+        if self.flag_insert=='true':
             self.closed_signal.emit(self.base_name)
         event.accept()
 
@@ -414,18 +358,18 @@ class selectBases(QtWidgets.QMainWindow):
         num=cb_numeracao.currentText()
         esp=cb_espessura.currentText()
         alt=cb_altura.currentText()
-        if(num == 'Escolha uma opção'):
+
+        if num == 'Escolha uma opção':
             num=0
-        if(esp == 'Escolha uma opção'):
+        if esp == 'Escolha uma opção':
             esp=0
-        if(alt == 'Escolha uma opção'):
+        if alt == 'Escolha uma opção':
             alt=0
-        
+
         self.base_name=num+'\\CONTATO_'+esp+'_'+alt+'.STL'
         self.flag_insert='true'
 
         self.close()
-        
 
 
 
