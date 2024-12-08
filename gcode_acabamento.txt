@@ -1,7 +1,7 @@
 G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin
 G21            ; Set units to millimeters
 G49            ; Cancel any tool offset that might be active
-G0 Z2         ; Move to safe height
+G0 Z6         ; Move to safe height
 M3 S13000      ; Start spindle rotation clockwise (M3) at 13000 RPM
 G1 X47.645 Y-43.001 Z-28.000   ; Linear move
 G1 X-13.355 Y-43.001 Z-28.000   ; Linear move
@@ -15,8 +15,8 @@ G1 X83.645 Y-35.001 Z-28.000   ; Linear move
 G1 X-109.355 Y-35.001 Z-28.000   ; Linear move
 G1 X-111.355 Y-33.001 Z-28.000   ; Linear move
 G1 X-75.355 Y-33.001 Z-28.000   ; Linear move
-G1 X-74.355 Y-33.001 Z-28.350   ; Linear move
-G1 X-71.355 Y-33.001 Z-28.350   ; Linear move
+G1 X-74.355 Y-33.001 Z-28.351   ; Linear move
+G1 X-71.355 Y-33.001 Z-28.351   ; Linear move
 G1 X-70.355 Y-33.001 Z-28.756   ; Linear move
 G1 X-66.355 Y-33.001 Z-28.756   ; Linear move
 G1 X-65.355 Y-33.001 Z-28.406   ; Linear move
@@ -1023,8 +1023,8 @@ G1 X57.645 Y6.999 Z-28.128   ; Linear move
 G1 X57.645 Y6.999 Z-28.128   ; Linear move
 G1 X58.645 Y6.999 Z-28.658   ; Linear move
 G1 X62.645 Y6.999 Z-28.658   ; Linear move
-G1 X63.645 Y6.999 Z-28.529   ; Linear move
-G1 X63.645 Y6.999 Z-28.529   ; Linear move
+G1 X63.645 Y6.999 Z-28.530   ; Linear move
+G1 X63.645 Y6.999 Z-28.530   ; Linear move
 G1 X64.645 Y6.999 Z-29.260   ; Linear move
 G1 X68.645 Y6.999 Z-29.260   ; Linear move
 G1 X69.645 Y6.999 Z-28.874   ; Linear move
@@ -1051,8 +1051,8 @@ G1 X68.645 Y8.999 Z-29.260   ; Linear move
 G1 X66.645 Y8.999 Z-29.260   ; Linear move
 G1 X65.645 Y8.999 Z-28.659   ; Linear move
 G1 X65.645 Y8.999 Z-28.659   ; Linear move
-G1 X64.645 Y8.999 Z-28.529   ; Linear move
-G1 X63.645 Y8.999 Z-28.529   ; Linear move
+G1 X64.645 Y8.999 Z-28.530   ; Linear move
+G1 X63.645 Y8.999 Z-28.530   ; Linear move
 G1 X62.645 Y8.999 Z-28.658   ; Linear move
 G1 X61.645 Y8.999 Z-28.658   ; Linear move
 G1 X60.645 Y8.999 Z-28.128   ; Linear move
@@ -1061,8 +1061,8 @@ G1 X59.645 Y8.999 Z-28.000   ; Linear move
 G1 X-121.355 Y8.999 Z-28.000   ; Linear move
 G1 X-120.355 Y10.999 Z-28.000   ; Linear move
 G1 X63.645 Y10.999 Z-28.000   ; Linear move
-G1 X64.645 Y10.999 Z-28.529   ; Linear move
-G1 X65.645 Y10.999 Z-28.529   ; Linear move
+G1 X64.645 Y10.999 Z-28.530   ; Linear move
+G1 X65.645 Y10.999 Z-28.530   ; Linear move
 G1 X66.645 Y10.999 Z-28.659   ; Linear move
 G1 X67.645 Y10.999 Z-28.659   ; Linear move
 G1 X68.645 Y10.999 Z-29.260   ; Linear move
@@ -1118,6 +1118,6 @@ G1 X28.645 Y40.999 Z-28.000   ; Linear move
 G1 X41.645 Y42.999 Z-28.000   ; Linear move
 G1 X90.645 Y42.999 Z-28.000   ; Linear move
 G1 X72.645 Y44.999 Z-28.000   ; Linear move
-G0 Z2         ; Move to safe height
+G0 Z6         ; Move to safe height
 M5; Stop spindle
 M30 ; Program end

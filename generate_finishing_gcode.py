@@ -46,6 +46,7 @@ class FinishingGCodeGenerator:
     def __init__(self, insole_file_path, config):
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
+        self.insole_proc.mesh.translate([0, 0, -self.config['block_height']], inplace=True)
         self.path_points = self.get_path_points(self.insole_proc)
 
     def get_path_points(self, insole_obj):
@@ -120,15 +121,15 @@ class FinishingGCodeGenerator:
             'G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin',
             "G21            ; Set units to millimeters",
             'G49            ; Cancel any tool offset that might be active',
-            f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height",
+            f"G0 Z{self.config['safe_z']}         ; Move to safe height",
             f"M3 S{self.config['rotation_speed']}      ; Start spindle rotation clockwise (M3) at {self.config['rotation_speed']} RPM"
         ]
 
 
         for x, y, z in self.path_points:
-            gcode.append(f"G1 X{x:.3f} Y{y:.3f} Z{z - 34:.3f}   ; Linear move")
+            gcode.append(f"G1 X{x:.3f} Y{y:.3f} Z{z:.3f}   ; Linear move")
 
-        gcode.append(f"G0 Z{self.config['safe_z'] - 34}         ; Move to safe height")
+        gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
 
         gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
@@ -147,7 +148,7 @@ if __name__ == "__main__":
         'raster_step': 1,
         'step_over': 1,
         'block_height': 34,
-        'safe_z': 36,
+        'safe_z': 6,
         'rotation_speed': 13000,
         'only_contour_height': 0.1
     }
