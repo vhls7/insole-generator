@@ -1,4 +1,4 @@
-# pylint: disable=I1101, W0401
+# pylint: disable=I1101, W0401, C0115
 
 import os
 import sys
@@ -131,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
             selec_file_container.setFrameShape(QtWidgets.QFrame.StyledPanel)
 
             # Horizontal layout for the item
+            item_vlayout = QtWidgets.QVBoxLayout(selec_file_container)
             item_hlayout = QtWidgets.QHBoxLayout(selec_file_container)
 
             file_label = QtWidgets.QLabel(file_name)
@@ -143,9 +144,33 @@ class MainWindow(QtWidgets.QMainWindow):
 
             delete_button = self.create_delete_button(file_name, selec_file_container)
             item_hlayout.addWidget(delete_button)
+            item_vlayout.addLayout(item_hlayout)
 
             # Adding the frame to the vBox container
             self.files_info_container.addWidget(selec_file_container)
+
+            transparency_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+            transparency_slider.setMinimum(0)  # Transparência mínima (opaco)
+            transparency_slider.setMaximum(100)  # Transparência máxima (totalmente transparente)
+            transparency_slider.setValue(100)  # Transparência inicial (opaco)
+            transparency_slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+            transparency_slider.setTickInterval(10)
+            transparency_slider.valueChanged.connect(lambda value, info=file_info: self.update_mesh_transparency(info['file_name'], value))
+            item_vlayout.addWidget(transparency_slider)
+
+    def update_mesh_transparency(self, file_name, value):
+        """Atualiza a transparência da malha com base no valor do slider."""
+        for attr, display_attr in [
+            ("scanned_file_info", "scanned_mesh_display"),
+            ("base_insole_file_info", "base_insole_mesh_display")
+        ]:
+            file_info = getattr(self, attr)
+            if (file_info and file_info['file_name'] == file_name):
+                mesh_display = getattr(self, display_attr)
+                opacity = value / 100.0
+                mesh_display.GetProperty().SetOpacity(opacity)  # Define a opacidade da malha
+                self.plotter.render()  # Atualiza a renderização do PyVista
+
 
     def create_delete_button(self, file_name, container):
         delete_button = QtWidgets.QPushButton()
@@ -268,7 +293,6 @@ class MainWindow(QtWidgets.QMainWindow):
             # Oculta o indicador de loading e exibe o widget do PyVista
             self.loading_label.hide()
             self.plotter.interactor.show()
-
 
     def load_bases(self):
 
