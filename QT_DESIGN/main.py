@@ -84,6 +84,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layout.addWidget(self.plotter.interactor)
         pyvista_widget.setLayout(self.layout)
 
+        self.loading_label = self.create_loading_component()
+        self.layout.addWidget(self.loading_label)  # Adiciona ao mesmo layout do PyVista
+
         # region Connecting buttons to functions
         self.findChild(QtWidgets.QPushButton, "loadScanButton").clicked.connect(self.load_scan_model)
 
@@ -109,6 +112,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.files_info_container = self.findChild(QtWidgets.QVBoxLayout, "filesInfoContainer")
         # endregion
+
+    def create_loading_component(self):
+        loading_label = QtWidgets.QLabel("Carregando...")
+        loading_label.setStyleSheet("font-size: 20px; color: red; text-align: center;")
+        loading_label.setAlignment(QtCore.Qt.AlignCenter)
+        loading_label.hide()  # Oculta inicialmente
+        return loading_label
 
     def build_files_list(self):
         # Cleaning the files_info_container to build from scratch
@@ -229,34 +239,45 @@ class MainWindow(QtWidgets.QMainWindow):
             self.scanned_file_info['mesh_scanned'] = rotate_mesh(self.scanned_file_info['mesh_scanned'], 0, 0, delta_z, True)
 
     def load_scan_model(self):
+        # Abre o diálogo para seleção de arquivo
+        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO', "", '*.stl')
 
-        # Starting the loading component
-        self.window_loading = loading()
-        self.window_loading.show()
+        # Verifica se nenhum arquivo foi selecionado
+        if not file_path:
+            return
 
-        # Getting file name
-        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO', "", '*.stl') # pylint: disable=undefined-variable
+        # Exibe o indicador de loading e oculta o widget do PyVista
+        self.loading_label.show()
+        self.plotter.interactor.hide()
+        QtWidgets.QApplication.processEvents()  # Atualiza a interface imediatamente
 
-        # Reading and filtering file
-        mesh_scanned = pv.read(file_path)
-        mesh_scanned = esphere_filt(mesh_scanned.points, 2)
+        try:
+            # Processa o modelo escaneado
+            mesh_scanned = pv.read(file_path)
+            mesh_scanned = esphere_filt(mesh_scanned.points, 2)
 
-        # Remaking surface
-        self.scanned_file_info = {
-            'mesh_scanned': pv.wrap(mesh_scanned).reconstruct_surface(), # type: ignore
-            'file_path': file_path,
-            'file_name': os.path.basename(file_path),
-            'description': 'Escaneado'
-        }
+            self.scanned_file_info = {
+                'mesh_scanned': pv.wrap(mesh_scanned).reconstruct_surface(),  # type: ignore
+                'file_path': file_path,
+                'file_name': os.path.basename(file_path),
+                'description': 'Escaneado'
+            }
 
-        # Generating 3D plot
-        self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh_scanned'], color="lightblue", label="Scanned")
-        self.plotter.reset_camera()
+            # Exibe o modelo no PyVista
+            self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh_scanned'], color="lightblue", label="Scanned")
+            self.plotter.reset_camera()
 
-        self.build_files_list()
+            # Atualiza a lista de arquivos carregados
+            self.build_files_list()
 
-        # Interrupting the loading component
-        self.window_loading.close()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Erro", f"Ocorreu um erro ao carregar o arquivo: {e}")
+
+        finally:
+            # Oculta o indicador de loading e exibe o widget do PyVista
+            self.loading_label.hide()
+            self.plotter.interactor.show()
+
 
     def load_bases(self):
 
@@ -298,8 +319,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_window_loading_bases_closed(self, message):
         # Esta função será chamada quando a segunda janela for fechada
 
-        base_name = os.path.join(r'palmilhas',message )
-        print(base_name)       
+        base_name = os.path.join(r'QT_DESIGN\palmilhas', message )
 
         # Verificar se o arquivo existe
         if os.path.exists(base_name):
@@ -324,14 +344,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.build_files_list()
 
-
-class loading(QtWidgets.QDialog):
-    def __init__(self):
-        super().__init__()
-        # Loading interface developed in Qt Designer
-        uic.loadUi(r"QT_DESIGN\loading.ui", self)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-
 class SelectBases(QtWidgets.QMainWindow):
     base_name=''
     closed_signal = pyqtSignal(str)
@@ -345,7 +357,7 @@ class SelectBases(QtWidgets.QMainWindow):
         inserir_base = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
         inserir_base.clicked.connect(self.load_base_padrao)
 
-    def close_event(self, event):
+    def closeEvent(self, event):
         # Emite o sinal ao fechar a janela, passando a string desejada
         if self.flag_insert=='true':
             self.closed_signal.emit(self.base_name)
