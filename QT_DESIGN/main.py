@@ -6,9 +6,7 @@ import sys
 import numpy as np
 import pyvista as pv
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from PyQt5.QtCore import Qt, pyqtSignal  # pylint: disable=no-name-in-module
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
 
 # Caminho do arquivo STL a ser carregado
@@ -77,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Adding pyvista plotter to the interface widget
         pyvista_widget = self.findChild(QtWidgets.QWidget, "pyvistaWidget")
-        self.layout = QVBoxLayout() # pylint: disable=undefined-variable
+        self.layout = QtWidgets.QVBoxLayout()
         self.plotter = QtInteractor(pyvista_widget)
         self.plotter.add_axes()
 
@@ -240,7 +238,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load_scan_model(self):
         # Abre o diálogo para seleção de arquivo
-        file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO', "", '*.stl')
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO ESCANEADO', "", '*.stl')
 
         # Verifica se nenhum arquivo foi selecionado
         if not file_path:
@@ -283,7 +281,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Starting the loading component
         self.window_loading_bases = SelectBases()
-        #self.window_loading = loading()
         self.window_loading_bases.closed_signal.connect(self.on_window_loading_bases_closed)
         self.window_loading_bases.show()
 
