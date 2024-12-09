@@ -9,13 +9,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
 
-# Caminho do arquivo STL a ser carregado
-SCANNED_FILE_PATH = r'input_files\CFFFP_Clayton Esquerdo.stl'
-PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
-
-pan_x_value = 0
-pan_y_value = 0
-pan_z_value = 0
 
 def get_centroid(your_mesh):
     centroid = np.mean(your_mesh.points.reshape(-1, 3), axis=0)
@@ -279,7 +272,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load_bases(self):
 
-        # Starting the loading component
         self.window_loading_bases = SelectBases()
         self.window_loading_bases.closed_signal.connect(self.on_window_loading_bases_closed)
         self.window_loading_bases.show()
@@ -317,16 +309,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Esta função será chamada quando a segunda janela for fechada
 
         base_name = os.path.join(r'QT_DESIGN\palmilhas', message )
-
-        # Verificar se o arquivo existe
-        if os.path.exists(base_name):
-            print("Arquivo STL carregado com sucesso.")
-        else:
-            print("Arquivo não encontrado.")
-
-        # Getting file name
-        #file_path, _ = QFileDialog.getOpenFileName(self, 'SELECIONAR ARQUIVO DA PALMILHA',"",'*.stl') # pylint: disable=undefined-variable
-        param_insole_mesh = pv.read(base_name)  # Lê o arquivo STL do SCANNED_FILE_PATH
+        param_insole_mesh = pv.read(base_name)
 
         self.base_insole_file_info = {
             'mesh_scanned': param_insole_mesh,
@@ -342,7 +325,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.build_files_list()
 
 class SelectBases(QtWidgets.QMainWindow):
-    base_name=''
     closed_signal = pyqtSignal(str)
     flag_insert='false'
     def __init__(self):
