@@ -5,6 +5,7 @@ import sys
 import resources_rc
 import numpy as np
 import pyvista as pv
+import resources_rc  # pylint: disable=unused-import
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
