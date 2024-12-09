@@ -2,7 +2,7 @@
 
 import os
 import sys
-
+import resources_rc
 import numpy as np
 import pyvista as pv
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
@@ -29,10 +29,10 @@ def rotate_mesh(mesh: pv.PolyData, angle_x=0, angle_y=0, angle_z=0, around_centr
 
     return mesh
 
-def esphere_filt(points, radius):
+def esphere_filt(points, radius, self):
     remaining_points = points.copy()
     filtered_points = []
-
+    index=len(remaining_points)
     while len(remaining_points) > 0:
         current_point = remaining_points[0]
         filtered_points.append(current_point)
@@ -40,6 +40,10 @@ def esphere_filt(points, radius):
         distances = np.linalg.norm(remaining_points - current_point, axis=1)
 
         remaining_points = remaining_points[distances > radius]
+        process=round((index-len(remaining_points))*100/(index))
+        self.loading_label.setText(f"Aplicando filtro de malha . . . ({process}%)")
+        app.processEvents()
+        
     return np.array(filtered_points)
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -56,8 +60,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.insole_output = None
 
+        self.param_insole_mesh= None
+
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"QT_DESIGN\main.ui", self)
+        uic.loadUi(r"main.ui", self)
 
         self.rotation_angle = 0
         self.offset_x = 0
@@ -246,7 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.offset_y = self.panY.value()
         self.offset_z = self.panZ.value()
 
-        self.scanned_file_info['mesh_scanned'].translate([delta_x, delta_y, delta_z], inplace=True)
+        self.scanned_file_info['mesh_scanned'].translate([-delta_x, delta_y, delta_z], inplace=True)
 
     def update_dial_value(self):
         if 'mesh_scanned' in self.scanned_file_info:
@@ -264,13 +270,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Exibe o indicador de loading e oculta o widget do PyVista
         self.loading_label.show()
+        self.loading_label.setText("Carregando o Modelo . . .")
+
         self.plotter.interactor.hide()
         QtWidgets.QApplication.processEvents()  # Atualiza a interface imediatamente
 
         try:
             # Processa o modelo escaneado
             mesh_scanned = pv.read(file_path)
-            mesh_scanned = esphere_filt(mesh_scanned.points, 2)
+            self.loading_label.setText("Aplicando filtro de malha . . .")
+            app.processEvents() 
+            mesh_scanned = esphere_filt(mesh_scanned.points, 2,self)
 
             self.scanned_file_info = {
                 'mesh_scanned': pv.wrap(mesh_scanned).reconstruct_surface(),  # type: ignore
@@ -308,8 +318,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.update()  # Atualiza o gráfico sem perder as configurações de exibição
 
     def cut_insole(self):
-        result_1 = self.mesh_parametric.boolean_difference(self.mesh_scanned)
-        result_2 = self.mesh_parametric.boolean_intersection(self.mesh_scanned)
+        try:
+            result_1 = self.param_insole_mesh.boolean_difference(self.scanned_file_info['mesh_scanned'])
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Erro", f"ERRO: {e}")
+        
+
+        try:
+            result_2 = self.param_insole_mesh.boolean_intersection(self.scanned_file_info['mesh_scanned'])
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Erro", f"ERRO: {e}")
+        
 
         if result_1.volume > result_2.volume:
             self.insole_output = result_1
@@ -332,18 +351,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_window_loading_bases_closed(self, message):
         # Esta função será chamada quando a segunda janela for fechada
 
-        base_name = os.path.join(r'QT_DESIGN\palmilhas', message )
-        param_insole_mesh = pv.read(base_name)
+        base_name = os.path.join(r'palmilhas', message )
+        self.param_insole_mesh = pv.read(base_name)
 
         self.base_insole_file_info = {
-            'mesh_scanned': param_insole_mesh,
+            'mesh_scanned': self.param_insole_mesh,
             'file_path': base_name,
             'file_name': os.path.basename('BASE'),
             'description': 'Palmilha Base'
         }
 
         # Remaking surface
-        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
+        self.base_insole_mesh_display = self.plotter.add_mesh(self.param_insole_mesh, color="orange", label="Parametric Insole")
         self.plotter.reset_camera()
 
         self.build_files_list()
@@ -354,7 +373,7 @@ class SelectBases(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"QT_DESIGN\select_base.ui", self)
+        uic.loadUi(r"select_base.ui", self)
         #self.setWindowFlags(Qt.FramelessWindowHint)
 
         inserir_base = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
