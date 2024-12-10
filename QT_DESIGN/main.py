@@ -395,7 +395,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     
         arquivo_stl = GET_FIRESTORE(base_name)
-        param_insole_mesh = pv.read(arquivo_stl)  # Lê o arquivo STL do SCANNED_FILE_PATH
+        param_insole_mesh = pv.read(r"tmp/arquivo_temporario.stl")  # Lê o arquivo STL do SCANNED_FILE_PATH
 
         self.base_insole_file_info = {
             'mesh_scanned': self.param_insole_mesh,
@@ -405,7 +405,7 @@ class MainWindow(QtWidgets.QMainWindow):
         }
 
         # Remaking surface
-        self.base_insole_mesh_display = self.plotter.add_mesh(self.param_insole_mesh, color="orange", label="Parametric Insole")
+        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
         self.plotter.reset_camera()
 
         self.build_files_list()
