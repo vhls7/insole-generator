@@ -8,6 +8,8 @@ class RoughingGCodeGenerator:
     def __init__(self, insole_file_path, config):
         self.config = config
         self.insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
+        self.insole_proc.mesh.translate([0, 0, -self.config['block_height']], inplace=True)
+        self.only_contour_height = self.config['only_contour_height'] - self.config['block_height']
         self.levels = self.get_levels()
         self.g_code = self.generate_gcode()
 
@@ -18,7 +20,7 @@ class RoughingGCodeGenerator:
             self.insole_proc,
             self.config['raster_step'],
             self.config['step_over'],
-            self.config['only_contour_height']
+            self.only_contour_height
         ).get_paths()
 
         z_levels = self.get_z_levels(min_z)
@@ -41,9 +43,9 @@ class RoughingGCodeGenerator:
         return levels
 
     def get_z_levels(self, min_z):
-        delta_z = self.config['block_height'] - min_z
+        delta_z = 0 - min_z
         real_z_step = delta_z / self.config['z_step']
-        z_levels = np.arange(self.config['block_height'] - real_z_step, min_z - real_z_step, -real_z_step)
+        z_levels = np.arange(0 - real_z_step, min_z - real_z_step, -real_z_step)
         return z_levels
 
     def generate_gcode(self):
@@ -70,6 +72,7 @@ class RoughingGCodeGenerator:
 
                 gcode.append(f"G0 Z{self.config['safe_z']}         ; Move to safe height")
 
+        gcode.append("M5; Stop spindle")
         gcode.append("M30 ; Program end")
         return "\n".join(gcode)
 
@@ -85,13 +88,14 @@ if __name__ == "__main__":
         'block_height': 34,
         'z_step': 6,
         'z_step_finish': 1,
-        'safe_z': 36,
-        'rotation_speed': 15000,
+        'safe_z': 6,
+        'rotation_speed': 13000,
         'only_contour_height': 0.1
     }
 
     g_code = RoughingGCodeGenerator(INSOLE_FILE_PATH, CONFIG).generate_gcode()
-    print(g_code)
+    with open("gcode_desbaste.txt", "w", encoding='utf8') as file:
+        file.write(g_code)
 
 
 # # region Plotting the result
