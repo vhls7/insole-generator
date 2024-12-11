@@ -23,7 +23,7 @@ class RoughingGCodeGenerator:
             self.only_contour_height
         ).get_paths()
 
-        z_levels = self.get_z_levels(min_z)
+        z_levels = self.get_z_levels(min_z, self.config['z_step'])
         levels = []
 
         for z in z_levels:
@@ -42,9 +42,10 @@ class RoughingGCodeGenerator:
 
         return levels
 
-    def get_z_levels(self, min_z):
+    @staticmethod
+    def get_z_levels(min_z, z_step):
         delta_z = 0 - min_z
-        real_z_step = delta_z / self.config['z_step']
+        real_z_step = delta_z / z_step
         z_levels = np.arange(0 - real_z_step, min_z - real_z_step, -real_z_step)
         return z_levels
 

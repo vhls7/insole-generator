@@ -1,0 +1,1017 @@
+G90            ; Set to absolute positioning mode, so all coordinates are relative to a fixed origin
+G21            ; Set units to millimeters
+G49            ; Cancel any tool offset that might be active
+G0 Z6         ; Move to safe height
+M3 S13000      ; Start spindle rotation clockwise (M3) at 13000 RPM
+G0 X22.115 Y-45.001        ; Rapid positioning to start of path
+G1 X22.115 Y-45.001 Z-5.583 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-5.583 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-5.583 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-5.583 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-5.583 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-5.583 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-5.583 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-5.583 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-5.583 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-5.583 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-5.583 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G1 X22.115 Y-45.001 Z-11.167 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-11.167 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-11.167 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-11.167 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-11.167 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-11.167 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-11.167 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-11.167 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-11.167 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-11.167 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-11.167 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G1 X22.115 Y-45.001 Z-16.750 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-16.750 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-16.750 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-16.750 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-16.750 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-16.750 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-16.750 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-16.750 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-16.750 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-16.750 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-16.750 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G1 X22.115 Y-45.001 Z-22.333 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-22.333 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-22.333 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-22.333 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-22.333 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-22.333 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-22.333 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-22.333 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-22.333 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-22.333 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-22.333 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G1 X22.115 Y-45.001 Z-27.917 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-27.917 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-27.917 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-27.917 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-27.917 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-27.917 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-27.917 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-27.917 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-27.917 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-27.917 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-27.917 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G1 X22.115 Y-45.001 Z-33.500 ; Linear move
+G1 X19.094 Y-44.996        ; Linear move
+G1 X16.074 Y-44.946        ; Linear move
+G1 X13.054 Y-44.852        ; Linear move
+G1 X10.036 Y-44.724        ; Linear move
+G1 X7.019 Y-44.566        ; Linear move
+G1 X4.004 Y-44.381        ; Linear move
+G1 X0.990 Y-44.175        ; Linear move
+G1 X0.990 Y-44.175 Z6.000 ; Linear move
+G0 X-14.067 Y-42.968        ; Linear move
+G1 X-14.067 Y-42.968 Z-33.500 ; Linear move
+G1 X-17.077 Y-42.709        ; Linear move
+G1 X-20.086 Y-42.449        ; Linear move
+G1 X-23.096 Y-42.191        ; Linear move
+G1 X-26.106 Y-41.935        ; Linear move
+G1 X-29.117 Y-41.685        ; Linear move
+G1 X-32.128 Y-41.441        ; Linear move
+G1 X-35.140 Y-41.208        ; Linear move
+G1 X-38.153 Y-40.984        ; Linear move
+G1 X-41.167 Y-40.775        ; Linear move
+G1 X-44.182 Y-40.584        ; Linear move
+G1 X-47.198 Y-40.414        ; Linear move
+G1 X-50.216 Y-40.277        ; Linear move
+G1 X-53.235 Y-40.179        ; Linear move
+G1 X-56.256 Y-40.133        ; Linear move
+G1 X-56.256 Y-40.133 Z6.000 ; Linear move
+G0 X-74.353 Y-41.027        ; Linear move
+G1 X-74.353 Y-41.027 Z-33.500 ; Linear move
+G1 X-77.367 Y-41.230        ; Linear move
+G1 X-80.384 Y-41.382        ; Linear move
+G1 X-83.403 Y-41.456        ; Linear move
+G1 X-86.424 Y-41.418        ; Linear move
+G1 X-89.439 Y-41.249        ; Linear move
+G1 X-92.442 Y-40.926        ; Linear move
+G1 X-95.419 Y-40.418        ; Linear move
+G1 X-98.362 Y-39.741        ; Linear move
+G1 X-101.249 Y-38.852        ; Linear move
+G1 X-104.071 Y-37.777        ; Linear move
+G1 X-106.809 Y-36.502        ; Linear move
+G1 X-109.443 Y-35.023        ; Linear move
+G1 X-111.938 Y-33.320        ; Linear move
+G1 X-111.938 Y-33.320 Z6.000 ; Linear move
+G0 X-122.735 Y-19.046        ; Linear move
+G1 X-122.735 Y-19.046 Z-33.500 ; Linear move
+G1 X-123.740 Y-16.200        ; Linear move
+G1 X-124.507 Y-13.280        ; Linear move
+G1 X-125.026 Y-10.306        ; Linear move
+G1 X-125.288 Y-7.299        ; Linear move
+G1 X-125.299 Y-4.281        ; Linear move
+G1 X-125.053 Y-1.273        ; Linear move
+G1 X-124.547 Y1.703        ; Linear move
+G1 X-123.780 Y4.623        ; Linear move
+G1 X-122.761 Y7.464        ; Linear move
+G1 X-121.495 Y10.205        ; Linear move
+G1 X-119.974 Y12.812        ; Linear move
+G1 X-118.226 Y15.274        ; Linear move
+G1 X-116.248 Y17.556        ; Linear move
+G1 X-114.077 Y19.656        ; Linear move
+G1 X-114.077 Y19.656 Z6.000 ; Linear move
+G0 X-101.033 Y27.070        ; Linear move
+G1 X-101.033 Y27.070 Z-33.500 ; Linear move
+G1 X-98.128 Y27.894        ; Linear move
+G1 X-95.171 Y28.504        ; Linear move
+G1 X-92.184 Y28.955        ; Linear move
+G1 X-89.183 Y29.295        ; Linear move
+G1 X-86.173 Y29.547        ; Linear move
+G1 X-83.157 Y29.721        ; Linear move
+G1 X-80.138 Y29.827        ; Linear move
+G1 X-77.117 Y29.874        ; Linear move
+G1 X-74.096 Y29.877        ; Linear move
+G1 X-71.076 Y29.838        ; Linear move
+G1 X-68.055 Y29.772        ; Linear move
+G1 X-65.036 Y29.688        ; Linear move
+G1 X-62.016 Y29.598        ; Linear move
+G1 X-58.996 Y29.511        ; Linear move
+G1 X-58.996 Y29.511 Z6.000 ; Linear move
+G0 X-40.876 Y29.601        ; Linear move
+G1 X-40.876 Y29.601 Z-33.500 ; Linear move
+G1 X-37.860 Y29.785        ; Linear move
+G1 X-34.849 Y30.022        ; Linear move
+G1 X-31.841 Y30.298        ; Linear move
+G1 X-28.837 Y30.621        ; Linear move
+G1 X-25.839 Y30.990        ; Linear move
+G1 X-22.844 Y31.391        ; Linear move
+G1 X-19.855 Y31.827        ; Linear move
+G1 X-16.870 Y32.294        ; Linear move
+G1 X-13.891 Y32.791        ; Linear move
+G1 X-10.915 Y33.314        ; Linear move
+G1 X-7.944 Y33.860        ; Linear move
+G1 X-4.977 Y34.427        ; Linear move
+G1 X-2.013 Y35.010        ; Linear move
+G1 X-2.013 Y35.010 Z6.000 ; Linear move
+G0 X15.739 Y38.676        ; Linear move
+G1 X15.739 Y38.676 Z-33.500 ; Linear move
+G1 X18.701 Y39.267        ; Linear move
+G1 X21.667 Y39.845        ; Linear move
+G1 X24.635 Y40.405        ; Linear move
+G1 X27.608 Y40.943        ; Linear move
+G1 X30.585 Y41.457        ; Linear move
+G1 X33.566 Y41.943        ; Linear move
+G1 X36.553 Y42.399        ; Linear move
+G1 X39.544 Y42.821        ; Linear move
+G1 X42.540 Y43.206        ; Linear move
+G1 X45.542 Y43.551        ; Linear move
+G1 X48.547 Y43.856        ; Linear move
+G1 X51.556 Y44.122        ; Linear move
+G1 X54.568 Y44.351        ; Linear move
+G1 X57.583 Y44.544        ; Linear move
+G1 X57.583 Y44.544 Z6.000 ; Linear move
+G0 X72.679 Y45.001        ; Linear move
+G1 X72.679 Y45.001 Z-33.500 ; Linear move
+G1 X75.700 Y44.952        ; Linear move
+G1 X78.718 Y44.818        ; Linear move
+G1 X81.729 Y44.580        ; Linear move
+G1 X84.728 Y44.212        ; Linear move
+G1 X87.705 Y43.706        ; Linear move
+G1 X90.655 Y43.055        ; Linear move
+G1 X93.568 Y42.257        ; Linear move
+G1 X96.436 Y41.309        ; Linear move
+G1 X99.251 Y40.214        ; Linear move
+G1 X101.999 Y38.960        ; Linear move
+G1 X104.673 Y37.556        ; Linear move
+G1 X107.251 Y35.982        ; Linear move
+G1 X109.741 Y34.274        ; Linear move
+G1 X112.128 Y32.425        ; Linear move
+G1 X112.128 Y32.425 Z6.000 ; Linear move
+G0 X123.315 Y18.381        ; Linear move
+G1 X123.315 Y18.381 Z-33.500 ; Linear move
+G1 X124.367 Y15.551        ; Linear move
+G1 X125.078 Y12.617        ; Linear move
+G1 X125.364 Y9.612        ; Linear move
+G1 X125.140 Y6.601        ; Linear move
+G1 X124.548 Y3.641        ; Linear move
+G1 X123.623 Y0.767        ; Linear move
+G1 X122.456 Y-2.018        ; Linear move
+G1 X121.096 Y-4.714        ; Linear move
+G1 X119.563 Y-7.316        ; Linear move
+G1 X117.878 Y-9.822        ; Linear move
+G1 X116.059 Y-12.233        ; Linear move
+G1 X114.124 Y-14.552        ; Linear move
+G1 X112.086 Y-16.780        ; Linear move
+G1 X112.086 Y-16.780 Z6.000 ; Linear move
+G0 X98.032 Y-28.151        ; Linear move
+G1 X98.032 Y-28.151 Z-33.500 ; Linear move
+G1 X95.435 Y-29.695        ; Linear move
+G1 X92.777 Y-31.130        ; Linear move
+G1 X90.058 Y-32.447        ; Linear move
+G1 X87.287 Y-33.648        ; Linear move
+G1 X84.470 Y-34.740        ; Linear move
+G1 X81.616 Y-35.730        ; Linear move
+G1 X78.733 Y-36.631        ; Linear move
+G1 X75.827 Y-37.457        ; Linear move
+G1 X72.903 Y-38.215        ; Linear move
+G1 X69.966 Y-38.923        ; Linear move
+G1 X67.020 Y-39.591        ; Linear move
+G1 X64.066 Y-40.226        ; Linear move
+G1 X61.106 Y-40.829        ; Linear move
+G1 X58.139 Y-41.399        ; Linear move
+G1 X58.139 Y-41.399 Z6.000 ; Linear move
+G0 X43.210 Y-43.674        ; Linear move
+G1 X43.210 Y-43.674 Z-33.500 ; Linear move
+G1 X40.207 Y-44.002        ; Linear move
+G1 X37.199 Y-44.287        ; Linear move
+G1 X34.188 Y-44.526        ; Linear move
+G1 X31.173 Y-44.717        ; Linear move
+G1 X28.155 Y-44.860        ; Linear move
+G1 X25.136 Y-44.957        ; Linear move
+G1 X22.115 Y-45.001        ; Linear move
+G0 Z6         ; Move to safe height
+M5; Stop spindle
+M30 ; Program end
