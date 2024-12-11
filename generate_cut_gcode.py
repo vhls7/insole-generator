@@ -5,18 +5,25 @@ from generate_roughing_gcode import RoughingGCodeGenerator
 
 
 class CuttingGCodeGenerator:
+    """Class created to generate the last step of the machining process."""
     def __init__(self, insole_file_path, config):
         self.config = config
-        self.nof_tabs = 10
-        self.tab_length = 10
+        self.contour_points_spacing = 3
+        self.nof_tabs = self.config['number_of_tabs']
+        self.tab_length = self.config['tab_length']
         self.z1 = 0
         self.z2 = self.config['safe_z']
+
+        # Compensating block height to make the zero be the block top surface
         self.min_z = self.config['min_z_cut'] - self.config['block_height']
+        self.only_contour_height = self.config['only_contour_height'] - self.config['block_height']
 
         self.insole_proc = self.initialize_insole_processor(insole_file_path)
-        self.only_contour_height = self.config['only_contour_height'] - self.config['block_height']
         self.z_levels = RoughingGCodeGenerator.get_z_levels(self.min_z, self.config['z_step'])
         self.contour_points = self.get_contour_points()
+        self.offseted_contour_points = InsoleMeshProcessor.offset_contour(
+            self.contour_points, self.config['tool_radius'], self.contour_points_spacing
+        )
         self.path = self.generate_path()
         self.levels = self.generate_paths()
         # path = self.path
@@ -32,16 +39,18 @@ class CuttingGCodeGenerator:
         # plotter.show()
 
     def initialize_insole_processor(self, insole_file_path):
+        """Initializes the insole mesh processor and applies a translation to make the zero be the block top surface."""
         insole_proc = InsoleMeshProcessor(insole_file_path, self.config['tool_radius'])
         insole_proc.mesh.translate([0, 0, -self.config['block_height']], inplace=True)
         return insole_proc
 
     def get_contour_points(self):
+        """Retrieves the contour points of the insole at the specified height."""
         contour_info = self.insole_proc.process_contours(self.only_contour_height)
         return contour_info['clusters'][0]['points']
 
     def calculate_normalized_cumulative_perimeter(self):
-        linear_distances = np.sqrt(np.sum(np.diff(self.contour_points, axis=0) ** 2, axis=1))  # sqrt(Δx^2 + Δy^2)
+        linear_distances = np.sqrt(np.sum(np.diff(self.offseted_contour_points, axis=0) ** 2, axis=1))  # sqrt(Δx^2 + Δy^2)
         cum_perimeter = np.concatenate(([0], np.cumsum(linear_distances)))
         total_perimeter = cum_perimeter[-1]
         norm_cum_perimeter = cum_perimeter / total_perimeter
@@ -63,16 +72,16 @@ class CuttingGCodeGenerator:
             # Outside tab area (z1)
             idxs_outside = np.nonzero((norm_cum_perimeter >= last_end) & (norm_cum_perimeter < start_tab))[0]
             if idxs_outside.size > 0:
-                values_outside = np.column_stack((self.contour_points[idxs_outside, :2], np.full_like(idxs_outside, self.z1, dtype=float)))
+                values_outside = np.column_stack((self.offseted_contour_points[idxs_outside, :2], np.full_like(idxs_outside, self.z1, dtype=float)))
                 path.append(values_outside)
 
             # Inside tab area (z2)
             idxs_inside = np.nonzero((norm_cum_perimeter >= start_tab) & (norm_cum_perimeter <= end_tab))[0]
             if idxs_inside.size > 0:
-                start_point_down = np.concatenate((self.contour_points[idxs_inside[0], :2], [self.z1]))
-                start_point_up = np.concatenate((self.contour_points[idxs_inside[0], :2], [self.z2]))
-                end_point_up = np.concatenate((self.contour_points[idxs_inside[-1], :2], [self.z2]))
-                end_point_down = np.concatenate((self.contour_points[idxs_inside[-1], :2], [self.z1]))
+                start_point_down = np.concatenate((self.offseted_contour_points[idxs_inside[0], :2], [self.z1]))
+                start_point_up = np.concatenate((self.offseted_contour_points[idxs_inside[0], :2], [self.z2]))
+                end_point_up = np.concatenate((self.offseted_contour_points[idxs_inside[-1], :2], [self.z2]))
+                end_point_down = np.concatenate((self.offseted_contour_points[idxs_inside[-1], :2], [self.z1]))
 
                 path.append(np.asarray([start_point_down, start_point_up, end_point_up, end_point_down]))
 
@@ -81,7 +90,7 @@ class CuttingGCodeGenerator:
         # Add remaining points outside the last tab area (z1)
         idxs_remaining = np.nonzero(norm_cum_perimeter > last_end)[0]
         if idxs_remaining.size > 0:
-            values_remaining = np.column_stack((self.contour_points[idxs_remaining, :2], np.full_like(idxs_remaining, self.z1, dtype=float)))
+            values_remaining = np.column_stack((self.offseted_contour_points[idxs_remaining, :2], np.full_like(idxs_remaining, self.z1, dtype=float)))
             path.append(values_remaining)
 
         # Flatten the list of arrays into a single array if needed
@@ -130,14 +139,14 @@ if __name__ == "__main__":
     # Dimension = 140 x 350 x 34
     CONFIG = {
         'tool_radius': 3,
-        'raster_step': 1,
-        'step_over': 1,
         'z_step': 6,
         'min_z_cut': 0.5,
         'block_height': 34,
         'safe_z': 6,
         'rotation_speed': 13000,
-        'only_contour_height': 0.1
+        'only_contour_height': 0.1,
+        'number_of_tabs': 10,
+        'tab_length': 10
     }
 
     g_code = CuttingGCodeGenerator(INSOLE_FILE_PATH, CONFIG).generate_gcode()

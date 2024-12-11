@@ -105,7 +105,8 @@ class InsoleMeshProcessor:
             lines[i] = [start, end]
         return lines
 
-    def spline_interpolation(self, points, spacing):
+    @staticmethod
+    def spline_interpolation(points, spacing):
 
         x, y, z = points[:, 0], points[:, 1], points[:, 2]
 
@@ -155,7 +156,7 @@ class InsoleMeshProcessor:
                 'points': interp_points,
                 'contour_lines': self.get_contour_lines(interp_points),
                 'is_raised_area': is_raised if not is_external_contour else None,
-                'offset': self.offset_contour(interp_points, offset_distance),
+                'offset': self.offset_contour(interp_points, offset_distance, self.spacing),
                 'cluster_idx': cluster_idx,
             })
         return contours_info
@@ -183,7 +184,8 @@ class InsoleMeshProcessor:
 
         pl.show()
 
-    def offset_contour(self, points, offset_distance):
+    @staticmethod
+    def offset_contour(points, offset_distance, spacing):
         z_val = points[0, 2]
         polygon = Polygon(points[:, :2])
 
@@ -192,7 +194,7 @@ class InsoleMeshProcessor:
 
         z = np.full(len(offset_coords), z_val)
         offset_points = np.column_stack((offset_coords, z))
-        equal_spaced_points = self.spline_interpolation(offset_points, self.spacing)
+        equal_spaced_points = InsoleMeshProcessor.spline_interpolation(offset_points, spacing)
         return equal_spaced_points
 
     def get_upper_surface_min_z(self, z_step_finish):
