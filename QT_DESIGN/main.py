@@ -9,6 +9,38 @@ import resources_rc  # pylint: disable=unused-import
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
+import firebase_admin
+from firebase_admin import credentials, firestore, storage
+
+
+
+######################################################################################################
+#                 INTERAÇÃO COM FIREBASE 
+######################################################################################################
+
+# CREDENCIAIS DO FIREBASE 
+cred = credentials.Certificate("./propulsao.json")
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'site-propulsao-allpe.appspot.com'  # Substitua pelo nome do bucket do Firebase
+})
+
+# CONECTAR FIREBASE E STORAGE
+db = firestore.client()
+bucket = storage.bucket()
+
+
+# BAIXA O ARQUIVO COM AS PARTES STL DA PALMILHA 
+def GET_FIRESTORE(caminho):
+    try:
+        blob = bucket.blob(caminho)
+        arquivo_temporario = r"tmp/arquivo_temporario.stl"
+        blob.download_to_filename(arquivo_temporario)
+        return arquivo_temporario
+    except Exception as e:
+        print(f"Erro ao baixar arquivo: {e}")
+
+#/PAMLILHAS_STL/19/BASES
+
 
 
 def get_centroid(your_mesh):
@@ -352,8 +384,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_window_loading_bases_closed(self, message):
         # Esta função será chamada quando a segunda janela for fechada
 
-        base_name = os.path.join(r'palmilhas', message )
-        self.param_insole_mesh = pv.read(base_name)
+        base_name = message
+        print(base_name)       
+
+        # Verificar se o arquivo existe
+        if os.path.exists(base_name):
+            print("Arquivo STL carregado com sucesso.")
+        else:
+            print("Arquivo não encontrado.")
+
+    
+        arquivo_stl = GET_FIRESTORE(base_name)
+        param_insole_mesh = pv.read(r"tmp/arquivo_temporario.stl")  # Lê o arquivo STL do SCANNED_FILE_PATH
 
         self.base_insole_file_info = {
             'mesh_scanned': self.param_insole_mesh,
@@ -363,7 +405,7 @@ class MainWindow(QtWidgets.QMainWindow):
         }
 
         # Remaking surface
-        self.base_insole_mesh_display = self.plotter.add_mesh(self.param_insole_mesh, color="orange", label="Parametric Insole")
+        self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
         self.plotter.reset_camera()
 
         self.build_files_list()
@@ -396,12 +438,14 @@ class SelectBases(QtWidgets.QMainWindow):
 
         if num == 'Escolha uma opção':
             num=0
-        if esp == 'Escolha uma opção':
-            esp=0
-        if alt == 'Escolha uma opção':
-            alt=0
+            return
+        if(esp == 'Escolha uma opção'):
+            esp=3
+        if(alt == 'Escolha uma opção'):
+            alt=1
+                
 
-        self.base_name=num+'\\CONTATO_'+esp+'_'+alt+'.STL'
+        self.base_name=f'PAMLILHAS_STL/{num}/BASES/CONTATO_{esp}_{alt}.STL'
         self.flag_insert='true'
 
         self.close()
