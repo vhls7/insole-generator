@@ -387,11 +387,18 @@
               </rect>
              </property>
              <property name="styleSheet">
-              <string notr="true">QPushButton {
+              <string notr="true">QPushButton:enabled {
 	font: 12pt &quot;Bernard MT Condensed&quot;;
 	border: none;
 	background-color: #133b70;
 	color: white;
+	border-radius: 13;
+}
+QPushButton:disabled {
+	font: 12pt &quot;Bernard MT Condensed&quot;;
+	border: none;
+	background-color: Gainsboro;
+	color: DimGray;
 	border-radius: 13;
 }
 </string>
