@@ -6,19 +6,18 @@ import sys
 import firebase_admin
 import numpy as np
 import pyvista as pv
+import resources_rc  # pylint: disable=unused-import
 from firebase_admin import credentials, firestore, storage
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
-
-import resources_rc  # pylint: disable=unused-import
+from windows.select_bases import SelectBases
 
 ######################################################################################################
 #                 INTERAÇÃO COM FIREBASE 
 ######################################################################################################
 
 # CREDENCIAIS DO FIREBASE 
-cred = credentials.Certificate("./propulsao.json")
+cred = credentials.Certificate(r"QT_DESIGN\propulsao.json")
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'site-propulsao-allpe.appspot.com'  # Substitua pelo nome do bucket do Firebase
 })
@@ -32,7 +31,7 @@ bucket = storage.bucket()
 def get_firestore(caminho):
     try:
         blob = bucket.blob(caminho)
-        temp_file_path = r"tmp/arquivo_temporario.stl"
+        temp_file_path = r"QT_DESIGN\tmp\arquivo_temporario.stl"
         blob.download_to_filename(temp_file_path)
         return temp_file_path
     except Exception as e:
@@ -92,10 +91,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.insole_output = None
 
-        self.param_insole_mesh= None
-
         # Loading interface developed in Qt Designer
-        uic.loadUi(r"main.ui", self)
+        uic.loadUi(r"QT_DESIGN\main.ui", self)
 
         self.rotation_angle = 0
         self.offset_x = 0
@@ -212,7 +209,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_delete_button(self, file_name, container):
         delete_button = QtWidgets.QPushButton()
-        delete_button.setIcon(QtGui.QIcon("resources/icons/trash-can-solid.svg"))
+        delete_button.setIcon(QtGui.QIcon(r"QT_DESIGN\resources\icons\trash-can-solid.svg"))
         delete_button.setStyleSheet(
             """
             QPushButton {
@@ -284,13 +281,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.offset_y = self.panY.value()
         self.offset_z = self.panZ.value()
 
-        self.scanned_file_info['mesh_scanned'].translate([-delta_x, delta_y, delta_z], inplace=True)
+        self.scanned_file_info['mesh'].translate([-delta_x, delta_y, delta_z], inplace=True)
 
     def update_dial_value(self):
-        if 'mesh_scanned' in self.scanned_file_info:
+        if 'mesh' in self.scanned_file_info:
             delta_z = self.rotation_angle - self.orbitZ.value()
             self.rotation_angle = self.orbitZ.value()
-            self.scanned_file_info['mesh_scanned'] = rotate_mesh(self.scanned_file_info['mesh_scanned'], 0, 0, delta_z, True)
+            self.scanned_file_info['mesh'] = rotate_mesh(self.scanned_file_info['mesh'], 0, 0, delta_z, True)
 
     def load_scan_model(self):
         # Abre o diálogo para seleção de arquivo
@@ -315,14 +312,14 @@ class MainWindow(QtWidgets.QMainWindow):
             mesh_scanned = esphere_filt(mesh_scanned.points, 2,self)
 
             self.scanned_file_info = {
-                'mesh_scanned': pv.wrap(mesh_scanned).reconstruct_surface(),  # type: ignore
+                'mesh': pv.wrap(mesh_scanned).reconstruct_surface(),  # type: ignore
                 'file_path': file_path,
                 'file_name': os.path.basename(file_path),
                 'description': 'Escaneado'
             }
 
             # Exibe o modelo no PyVista
-            self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh_scanned'], color="lightblue", label="Scanned")
+            self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh'], color="lightblue", label="Scanned")
             self.plotter.reset_camera()
 
             # Atualiza a lista de arquivos carregados
@@ -337,10 +334,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.plotter.interactor.show()
 
     def load_bases(self):
+        window_loading_bases = SelectBases()
 
-        self.window_loading_bases = SelectBases()
-        self.window_loading_bases.closed_signal.connect(self.on_window_loading_bases_closed)
-        self.window_loading_bases.show()
+        # Connecting the closing sinal to the function
+        window_loading_bases.closed_signal.connect(self.load_base_insole)
+
+        # Showing the select base tab
+        window_loading_bases.show()
 
     def update_plotter(self):
         """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
@@ -351,16 +351,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def cut_insole(self):
         try:
-            result_1 = self.param_insole_mesh.boolean_difference(self.scanned_file_info['mesh_scanned'])
+            result_1 = self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
+            result_2 = self.base_insole_file_info['mesh'].boolean_intersection(self.scanned_file_info['mesh'])
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Erro", f"ERRO: {e}")
-        
-
-        try:
-            result_2 = self.param_insole_mesh.boolean_intersection(self.scanned_file_info['mesh_scanned'])
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "Erro", f"ERRO: {e}")
-        
 
         if result_1.volume > result_2.volume:
             self.insole_output = result_1
@@ -380,26 +374,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.camera_position = [position, focal, up]
         self.plotter.reset_camera()
 
-    def on_window_loading_bases_closed(self, message):
-        # Esta função será chamada quando a segunda janela for fechada
+    def load_base_insole(self, message):
 
         base_name = message
-        print(base_name)
-
-        # Verificar se o arquivo existe
-        if os.path.exists(base_name):
-            print("Arquivo STL carregado com sucesso.")
-        else:
-            print("Arquivo não encontrado.")
-
-    
-        arquivo_stl = get_firestore(base_name)
-        param_insole_mesh = pv.read(r"tmp/arquivo_temporario.stl")  # Lê o arquivo STL do SCANNED_FILE_PATH
+        temp_file_name = get_firestore(base_name)
+        param_insole_mesh = pv.read(temp_file_name)
 
         self.base_insole_file_info = {
-            'mesh_scanned': self.param_insole_mesh,
+            'mesh': param_insole_mesh,
             'file_path': base_name,
-            'file_name': os.path.basename('BASE'),
+            'file_name': 'BASE',
             'description': 'Palmilha Base'
         }
 
@@ -408,60 +392,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.reset_camera()
 
         self.build_files_list()
-
-class SelectBases(QtWidgets.QMainWindow):
-    closed_signal = pyqtSignal(str)
-    flag_insert='false'
-    def __init__(self):
-        super().__init__()
-
-        self.base_name = None
-
-        # Loading interface developed in Qt Designer
-        uic.loadUi(r"select_base.ui", self)
-
-        # region Connecting buttons to functions
-        self.select_base_button = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
-        self.select_base_button.clicked.connect(self.load_parametric_base)
-
-        self.cb_sizing = self.findChild(QtWidgets.QComboBox, "CB_numeracao")
-        self.cb_sizing.currentTextChanged.connect(self.update_button_state)
-    
-        self.cb_thickness = self.findChild(QtWidgets.QComboBox, "CB_espessura")
-        self.cb_thickness.currentTextChanged.connect(self.update_button_state)
-
-        self.cb_height = self.findChild(QtWidgets.QComboBox, "CB_calcanhar")
-        self.cb_height.currentTextChanged.connect(self.update_button_state)
-        # endregion
-
-        self.update_button_state()
-
-    def closeEvent(self, event):
-        # Emite o sinal ao fechar a janela, passando a string desejada
-        if self.flag_insert == 'true':
-            self.closed_signal.emit(self.base_name)
-        event.accept()
-
-    def load_parametric_base(self):
-        num = self.cb_sizing.currentText()
-        esp = self.cb_thickness.currentText()
-        alt = self.cb_height.currentText()
-
-        self.base_name = f'PAMLILHAS_STL/{num}/BASES/CONTATO_{esp}_{alt}.STL'
-        self.flag_insert='true'
-
-        self.close()
-
-    def update_button_state(self):
-        default_text = "Escolha uma opção"
-
-        # Check if all ComboBoxes have a valid selection
-        is_valid_num = self.cb_sizing.currentText() != default_text
-        is_valid_esp = self.cb_thickness.currentText() != default_text
-        is_valid_alt = self.cb_height.currentText() != default_text
-
-        # Enables or disables the button based on conditions
-        self.select_base_button.setEnabled(is_valid_num and is_valid_esp and is_valid_alt)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
