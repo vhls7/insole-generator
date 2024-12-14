@@ -104,8 +104,8 @@ def get_intersection(base_insole, scan_surface):
 
 if __name__ == "__main__":
     SCANNED_FILE_PATH = r'input_files\julia.stl'
-   # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
-   # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
+    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\base45_tipo3_S.stl'
+    # PARAMETRIC_INSOLE_FILE_PATH = r'input_files\ESQ_base45_tipo3_S.stl'
     PARAMETRIC_INSOLE_FILE_PATH = r'input_files\palmilha6.stl'
     FILT_SURF_FILE_PATH = r'output_files\filt_surf.stl'
     INSOLE_FILE_PATH = r'output_files\insole.stl'

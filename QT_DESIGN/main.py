@@ -28,7 +28,7 @@ bucket = storage.bucket()
 
 
 # BAIXA O ARQUIVO COM AS PARTES STL DA PALMILHA 
-def get_firestore(caminho):
+def get_file_from_firebase(caminho):
     try:
         blob = bucket.blob(caminho)
         temp_file_path = r"QT_DESIGN\tmp\arquivo_temporario.stl"
@@ -90,6 +90,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.base_insole_mesh_display = None
 
         self.insole_output = None
+
+        self.window_loading_bases = None
 
         # Loading interface developed in Qt Designer
         uic.loadUi(r"QT_DESIGN\main.ui", self)
@@ -205,7 +207,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 opacity = value / 100.0
                 mesh_display.GetProperty().SetOpacity(opacity)  # Define a opacidade da malha
                 self.plotter.render()  # Atualiza a renderização do PyVista
-
 
     def create_delete_button(self, file_name, container):
         delete_button = QtWidgets.QPushButton()
@@ -334,13 +335,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.plotter.interactor.show()
 
     def load_bases(self):
-        window_loading_bases = SelectBases()
+        self.window_loading_bases = SelectBases()
 
         # Connecting the closing sinal to the function
-        window_loading_bases.closed_signal.connect(self.load_base_insole)
+        self.window_loading_bases.closed_signal.connect(self.load_base_insole)
 
         # Showing the select base tab
-        window_loading_bases.show()
+        self.window_loading_bases.show()
 
     def update_plotter(self):
         """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
@@ -377,7 +378,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_base_insole(self, message):
 
         base_name = message
-        temp_file_name = get_firestore(base_name)
+        temp_file_name = get_file_from_firebase(base_name)
         param_insole_mesh = pv.read(temp_file_name)
 
         self.base_insole_file_info = {
