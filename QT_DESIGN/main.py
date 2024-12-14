@@ -139,6 +139,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.findChild(QtWidgets.QPushButton, "cleanButton").clicked.connect(lambda: self.remove_file_item(remove_all=True))
 
         self.files_info_container = self.findChild(QtWidgets.QVBoxLayout, "filesInfoContainer")
+        self.lb_loaded_files = self.findChild(QtWidgets.QLabel, "lb_loaded_files")
+        self.lb_loaded_files.setVisible(False)
         # endregion
 
     def create_loading_component(self):
@@ -156,7 +158,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 child.widget().deleteLater()
 
         if self.scanned_file_info or self.base_insole_file_info:
-            self.create_selected_files_header()
+            self.lb_loaded_files.setVisible(True)
+        else:
+            self.lb_loaded_files.setVisible(False)
 
 
         for file_info in (self.scanned_file_info, self.base_insole_file_info):
@@ -228,26 +232,6 @@ class MainWindow(QtWidgets.QMainWindow):
         delete_button.clicked.connect(lambda _, item=container, name=file_name: self.remove_file_item(item, name))
         return delete_button
 
-    def create_selected_files_header(self):
-        title_label = QtWidgets.QLabel("Arquivos Carregados")
-        title_label.setAlignment(QtCore.Qt.AlignCenter)
-        title_label.setStyleSheet(
-            """
-            QLabel {
-                background-color: qlineargradient(
-                    spread: pad, x1: 0, y1: 0, x2: 1, y2: 0,
-                    stop: 0 #007BFF, stop: 1 #00C6FF
-                );
-                color: white;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 8px;
-                border-radius: 10px;
-            }
-            """
-        )
-        self.files_info_container.addWidget(title_label)
-
     def remove_file_item(self, file_item=None, file_name='', remove_all=False):
         # Removing selected file
         for attr, display_attr in [
@@ -272,6 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # Remove o widget e o exclui
                 self.files_info_container.removeWidget(widget)
                 widget.deleteLater()
+        self.build_files_list()
 
     def update_slider_value(self):
         delta_x = self.offset_x - self.panX.value()

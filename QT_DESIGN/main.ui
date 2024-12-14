@@ -964,10 +964,37 @@ QPushButton:pressed {
             </spacer>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="filesInfoContainer">
-             <property name="sizeConstraint">
-              <enum>QLayout::SetMaximumSize</enum>
-             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QLabel" name="lb_loaded_files">
+               <property name="styleSheet">
+                <string notr="true">            QLabel {
+                background-color: qlineargradient(
+                    spread: pad, x1: 0, y1: 0, x2: 1, y2: 0,
+                    stop: 0 #007BFF, stop: 1 #00C6FF
+                );
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 8px;
+                border-radius: 10px;
+            }</string>
+               </property>
+               <property name="text">
+                <string>Arquivos Carregados</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="filesInfoContainer">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetMaximumSize</enum>
+               </property>
+              </layout>
+             </item>
             </layout>
            </item>
            <item>
