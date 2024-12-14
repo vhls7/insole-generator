@@ -2,17 +2,16 @@
 
 import os
 import sys
-import resources_rc
+
+import firebase_admin
 import numpy as np
 import pyvista as pv
-import resources_rc  # pylint: disable=unused-import
+from firebase_admin import credentials, firestore, storage
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal  # pylint: disable=no-name-in-module
 from pyvistaqt import QtInteractor
-import firebase_admin
-from firebase_admin import credentials, firestore, storage
 
-
+import resources_rc  # pylint: disable=unused-import
 
 ######################################################################################################
 #                 INTERAÇÃO COM FIREBASE 
@@ -30,12 +29,12 @@ bucket = storage.bucket()
 
 
 # BAIXA O ARQUIVO COM AS PARTES STL DA PALMILHA 
-def GET_FIRESTORE(caminho):
+def get_firestore(caminho):
     try:
         blob = bucket.blob(caminho)
-        arquivo_temporario = r"tmp/arquivo_temporario.stl"
-        blob.download_to_filename(arquivo_temporario)
-        return arquivo_temporario
+        temp_file_path = r"tmp/arquivo_temporario.stl"
+        blob.download_to_filename(temp_file_path)
+        return temp_file_path
     except Exception as e:
         print(f"Erro ao baixar arquivo: {e}")
 
@@ -213,7 +212,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def create_delete_button(self, file_name, container):
         delete_button = QtWidgets.QPushButton()
-        delete_button.setIcon(QtGui.QIcon("QT_DESIGN/resources/icons/trash-can-solid.svg"))
+        delete_button.setIcon(QtGui.QIcon("resources/icons/trash-can-solid.svg"))
         delete_button.setStyleSheet(
             """
             QPushButton {
@@ -385,7 +384,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Esta função será chamada quando a segunda janela for fechada
 
         base_name = message
-        print(base_name)       
+        print(base_name)
 
         # Verificar se o arquivo existe
         if os.path.exists(base_name):
@@ -394,7 +393,7 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Arquivo não encontrado.")
 
     
-        arquivo_stl = GET_FIRESTORE(base_name)
+        arquivo_stl = get_firestore(base_name)
         param_insole_mesh = pv.read(r"tmp/arquivo_temporario.stl")  # Lê o arquivo STL do SCANNED_FILE_PATH
 
         self.base_insole_file_info = {
@@ -417,35 +416,35 @@ class SelectBases(QtWidgets.QMainWindow):
         super().__init__()
         # Loading interface developed in Qt Designer
         uic.loadUi(r"select_base.ui", self)
-        #self.setWindowFlags(Qt.FramelessWindowHint)
 
-        inserir_base = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
-        inserir_base.clicked.connect(self.load_base_padrao)
+        # Connecting button to function
+        select_base_button = self.findChild(QtWidgets.QPushButton, "btn_inserir_base")
+        select_base_button.clicked.connect(self.load_parametric_base)
 
     def closeEvent(self, event):
         # Emite o sinal ao fechar a janela, passando a string desejada
-        if self.flag_insert=='true':
+        if self.flag_insert == 'true':
             self.closed_signal.emit(self.base_name)
         event.accept()
 
-    def load_base_padrao(self):
+    def load_parametric_base(self):
         cb_numeracao = self.findChild(QtWidgets.QComboBox, "CB_numeracao")
         cb_espessura = self.findChild(QtWidgets.QComboBox, "CB_espessura")
         cb_altura = self.findChild(QtWidgets.QComboBox, "CB_calcanhar")
-        num=cb_numeracao.currentText()
-        esp=cb_espessura.currentText()
-        alt=cb_altura.currentText()
+        num = cb_numeracao.currentText()
+        esp = cb_espessura.currentText()
+        alt = cb_altura.currentText()
 
         if num == 'Escolha uma opção':
-            num=0
+            num = 0
             return
         if(esp == 'Escolha uma opção'):
-            esp=3
+            esp = 3
         if(alt == 'Escolha uma opção'):
-            alt=1
+            alt = 1
                 
 
-        self.base_name=f'PAMLILHAS_STL/{num}/BASES/CONTATO_{esp}_{alt}.STL'
+        self.base_name = f'PAMLILHAS_STL/{num}/BASES/CONTATO_{esp}_{alt}.STL'
         self.flag_insert='true'
 
         self.close()
