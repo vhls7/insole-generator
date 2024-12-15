@@ -295,16 +295,18 @@ class MainWindow(QtWidgets.QMainWindow):
             mesh_scanned = pv.read(file_path)
             self.loading_label.setText("Aplicando filtro de malha . . .")
             app.processEvents() 
-            mesh_scanned = esphere_filt(mesh_scanned.points, 2,self)
+            mesh_scanned = esphere_filt(mesh_scanned.points, 3, self)
 
             self.scanned_file_info = {
-                'mesh': pv.wrap(mesh_scanned).reconstruct_surface(),  # type: ignore
+                'mesh': pv.wrap(mesh_scanned).reconstruct_surface(), # type: ignore
                 'file_path': file_path,
                 'file_name': os.path.basename(file_path),
                 'description': 'Escaneado'
             }
 
-            # Exibe o modelo no PyVista
+            # Adding mesh to plot
+            if self.scanned_mesh_display:
+                self.plotter.remove_actor(self.scanned_mesh_display)
             self.scanned_mesh_display = self.plotter.add_mesh(self.scanned_file_info['mesh'], color="lightblue", label="Scanned")
             self.plotter.reset_camera()
 
@@ -360,11 +362,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.camera_position = [position, focal, up]
         self.plotter.reset_camera()
 
-    def load_base_insole(self, message):
+    def load_base_insole(self, message, side):
 
         base_name = message
         temp_file_name = get_file_from_firebase(base_name)
         param_insole_mesh = pv.read(temp_file_name)
+        if side == 'Esquerdo':
+            param_insole_mesh = param_insole_mesh.reflect((1, 0, 0), point=(0, 0, 0))
 
         self.base_insole_file_info = {
             'mesh': param_insole_mesh,
@@ -373,7 +377,9 @@ class MainWindow(QtWidgets.QMainWindow):
             'description': 'Palmilha Base'
         }
 
-        # Remaking surface
+        # Adding mesh to plot
+        if self.base_insole_mesh_display:
+            self.plotter.remove_actor(self.base_insole_mesh_display)
         self.base_insole_mesh_display = self.plotter.add_mesh(param_insole_mesh, color="orange", label="Parametric Insole")
         self.plotter.reset_camera()
 

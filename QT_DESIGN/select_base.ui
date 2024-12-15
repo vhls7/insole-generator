@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
+    <width>850</width>
     <height>626</height>
    </rect>
   </property>
@@ -86,302 +86,11 @@
             <property name="title">
              <string/>
             </property>
-            <widget class="QComboBox" name="CB_numeracao">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>70</y>
-               <width>281</width>
-               <height>41</height>
-              </rect>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QComboBox{
-	font: 10pt &quot;Bernard MT Condensed&quot;;
-}
-</string>
-             </property>
-             <property name="currentText">
-              <string>Escolha uma opção</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Escolha uma opção</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>19</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>20</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>21</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>22</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>23</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>24</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>25</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>26</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>27</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>28</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>29</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>30</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>31</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>32</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>33</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>34</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>35</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>36</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>37</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>38</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>39</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>40</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>41</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>42</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>43</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>44</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>45</string>
-              </property>
-             </item>
-            </widget>
-            <widget class="QComboBox" name="CB_espessura">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>160</y>
-               <width>281</width>
-               <height>41</height>
-              </rect>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QComboBox{
-	font: 10pt &quot;Bernard MT Condensed&quot;;
-}
-</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Escolha uma opção</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>3</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>4</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>5</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>6</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>7</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>8</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>9</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>10</string>
-              </property>
-             </item>
-            </widget>
-            <widget class="QComboBox" name="CB_calcanhar">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>260</y>
-               <width>281</width>
-               <height>41</height>
-              </rect>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QComboBox{
-	font: 10pt &quot;Bernard MT Condensed&quot;;
-}
-</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Escolha uma opção</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>1</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>3</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>4</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>5</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>6</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>7</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>8</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>9</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>10</string>
-              </property>
-             </item>
-            </widget>
-            <widget class="QPushButton" name="btn_inserir_base">
+            <widget class="QPushButton" name="btnSelectBase">
              <property name="geometry">
               <rect>
                <x>160</x>
-               <y>390</y>
+               <y>470</y>
                <width>131</width>
                <height>41</height>
               </rect>
@@ -411,7 +120,7 @@ QPushButton:disabled {
              <property name="geometry">
               <rect>
                <x>20</x>
-               <y>390</y>
+               <y>470</y>
                <width>131</width>
                <height>41</height>
               </rect>
@@ -430,128 +139,530 @@ QPushButton:disabled {
               <string>Cancelar</string>
              </property>
             </widget>
-            <widget class="QLabel" name="OrbitLabel">
+            <widget class="QWidget" name="verticalLayoutWidget_5">
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>30</y>
-               <width>120</width>
-               <height>20</height>
+               <y>20</y>
+               <width>291</width>
+               <height>411</height>
               </rect>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>120</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>5000</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>Bernard MT Condensed</family>
-               <pointsize>12</pointsize>
-               <weight>50</weight>
-               <italic>false</italic>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <property name="spacing">
+                 <number>2</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="OrbitLabel_4">
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>5000</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Bernard MT Condensed</family>
+                    <pointsize>12</pointsize>
+                    <weight>50</weight>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">
 	font: 12pt &quot;Bernard MT Condensed&quot;;
 </string>
-             </property>
-             <property name="text">
-              <string>Numeração:</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-            <widget class="QLabel" name="OrbitLabel_2">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>130</y>
-               <width>211</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>120</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>5000</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>Bernard MT Condensed</family>
-               <pointsize>12</pointsize>
-               <weight>50</weight>
-               <italic>false</italic>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">
+                  </property>
+                  <property name="text">
+                   <string>Lado</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="cbSide">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QComboBox{
+	font: 10pt &quot;Bernard MT Condensed&quot;;
+}
+</string>
+                  </property>
+                  <property name="currentText">
+                   <string>Escolha uma opção</string>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Escolha uma opção</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Direito</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Esquerdo</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QLabel" name="OrbitLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>5000</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Bernard MT Condensed</family>
+                    <pointsize>12</pointsize>
+                    <weight>50</weight>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">
 	font: 12pt &quot;Bernard MT Condensed&quot;;
 </string>
-             </property>
-             <property name="text">
-              <string>Espessura da palmilha (E):</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-            <widget class="QLabel" name="OrbitLabel_3">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>220</y>
-               <width>191</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>120</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>5000</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>Bernard MT Condensed</family>
-               <pointsize>12</pointsize>
-               <weight>50</weight>
-               <italic>false</italic>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">
+                  </property>
+                  <property name="text">
+                   <string>Numeração</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="cbSize">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QComboBox{
+	font: 10pt &quot;Bernard MT Condensed&quot;;
+}
+</string>
+                  </property>
+                  <property name="currentText">
+                   <string>Escolha uma opção</string>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Escolha uma opção</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>19</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>20</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>21</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>22</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>23</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>24</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>25</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>26</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>27</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>28</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>29</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>30</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>31</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>32</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>33</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>34</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>35</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>36</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>37</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>38</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>39</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>40</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>41</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>42</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>43</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>44</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>45</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QLabel" name="OrbitLabel_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>5000</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Bernard MT Condensed</family>
+                    <pointsize>12</pointsize>
+                    <weight>50</weight>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">
 	font: 12pt &quot;Bernard MT Condensed&quot;;
 </string>
-             </property>
-             <property name="text">
-              <string>Altura do calcanhar (D):</string>
-             </property>
+                  </property>
+                  <property name="text">
+                   <string>Espessura da palmilha (E)</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="cbThickness">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QComboBox{
+	font: 10pt &quot;Bernard MT Condensed&quot;;
+}
+</string>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Escolha uma opção</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>3</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>5</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>8</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>9</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>10</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <widget class="QLabel" name="OrbitLabel_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>120</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>5000</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Bernard MT Condensed</family>
+                    <pointsize>12</pointsize>
+                    <weight>50</weight>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">
+	font: 12pt &quot;Bernard MT Condensed&quot;;
+</string>
+                  </property>
+                  <property name="text">
+                   <string>Altura do calcanhar (D)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="cbHeel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QComboBox{
+	font: 10pt &quot;Bernard MT Condensed&quot;;
+}
+</string>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Escolha uma opção</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>2</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>3</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>5</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>8</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>9</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>10</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
