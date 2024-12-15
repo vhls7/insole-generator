@@ -77,6 +77,29 @@ def esphere_filt(points, radius, self):
         
     return np.array(filtered_points)
 
+def cut_mesh(mesh: pv.PolyData, axis, cut_value=0) -> pv.PolyData:
+    """Clip the mesh along a specified axis at a given cut value."""
+    bounds = mesh.bounds  # mesh.bounds returns [xmin, xmax, ymin, ymax, zmin, zmax]
+
+    if axis == 'x':
+        clip_bounds = [bounds[0], cut_value, bounds[2], bounds[3], bounds[4], bounds[5]]
+    elif axis == 'y':
+        clip_bounds = [bounds[0], bounds[1], bounds[2], cut_value, bounds[4], bounds[5]]
+    elif axis == 'z':
+        clip_bounds = [bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], cut_value]
+    else:
+        raise ValueError("Invalid axis. Choose between 'x', 'y', 'z'.")
+
+    # Clip the mesh with the computed bounds
+    cutted_mesh = mesh.clip_box(bounds=clip_bounds, invert=False)
+
+    if cutted_mesh is not None:
+        cutted_mesh = cutted_mesh.extract_surface()
+        if isinstance(cutted_mesh, pv.PolyData):
+            return cutted_mesh
+    raise TypeError("Error cutting the file")
+
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -293,8 +316,9 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             # Processa o modelo escaneado
             mesh_scanned = pv.read(file_path)
+            # mesh_scanned = cut_mesh(mesh_scanned, 'z', 15)
             self.loading_label.setText("Aplicando filtro de malha . . .")
-            app.processEvents() 
+            app.processEvents()
             mesh_scanned = esphere_filt(mesh_scanned.points, 3, self)
 
             self.scanned_file_info = {
@@ -367,8 +391,10 @@ class MainWindow(QtWidgets.QMainWindow):
         base_name = message
         temp_file_name = get_file_from_firebase(base_name)
         param_insole_mesh = pv.read(temp_file_name)
+
         if side == 'Esquerdo':
-            param_insole_mesh = param_insole_mesh.reflect((1, 0, 0), point=(0, 0, 0))
+            param_insole_mesh.reflect((1, 0, 0), point=(0, 0, 0), inplace=True)
+            param_insole_mesh.flip_normals()
 
         self.base_insole_file_info = {
             'mesh': param_insole_mesh,
