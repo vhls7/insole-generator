@@ -85,7 +85,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.base_insole_file_info = {}
         self.base_insole_mesh_display = None
 
-        self.insole_output = None
+        self.output_insole_file_info = {}
+        self.output_insole_mesh_display = None
 
         self.window_loading_bases = None
 
@@ -162,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.lb_loaded_files.setVisible(False)
 
 
-        for file_info in (self.scanned_file_info, self.base_insole_file_info):
+        for file_info in (self.scanned_file_info, self.base_insole_file_info, self.output_insole_file_info):
             if not file_info:
                 continue
             file_name = file_info['file_name']
@@ -235,7 +236,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Removing selected file
         for attr, display_attr in [
             ("scanned_file_info", "scanned_mesh_display"), 
-            ("base_insole_file_info", "base_insole_mesh_display")
+            ("base_insole_file_info", "base_insole_mesh_display"),
+            ("output_insole_file_info", "output_insole_mesh_display"),
         ]:
             file_info = getattr(self, attr)
             if (file_info and file_info['file_name'] == file_name) or remove_all:
@@ -330,16 +332,22 @@ class MainWindow(QtWidgets.QMainWindow):
         # Showing the select base tab
         self.window_loading_bases.show()
 
-    def update_plotter(self):
-        """Atualiza o gráfico 3D com o modelo rotacionado sem resetar a câmera ou outras configurações"""
-        self.plotter.clear_actors()  # Limpa o gráfico atual
-        # Repinta os dois modelos no gráfico
-        self.plotter.add_mesh(self.insole_output, color="lightblue", label="Resultado")
-        self.plotter.update()  # Atualiza o gráfico sem perder as configurações de exibição
-
     def cut_insole(self):
-        self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
-        self.update_plotter()
+        output_mesh = self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
+
+        # Removing all the selected files
+        self.remove_file_item(remove_all=True)
+
+        self.output_insole_file_info = {
+            'mesh': output_mesh,
+            'file_path': 'path',
+            'file_name': 'Palmilha Gerada',
+            'description': 'Informações'
+        }
+        self.output_insole_mesh_display = self.plotter.add_mesh(output_mesh, color="orange", label="Output Insole")
+        self.plotter.reset_camera()
+
+        self.build_files_list()
 
     def set_camera_view(self, view):
         views = {
