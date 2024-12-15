@@ -3,42 +3,13 @@
 import os
 import sys
 
-import firebase_admin
 import numpy as np
 import pyvista as pv
 import resources_rc  # pylint: disable=unused-import
-from firebase_admin import credentials, firestore, storage
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from pyvistaqt import QtInteractor
 from windows.select_bases import SelectBases
-
-######################################################################################################
-#                 INTERAÇÃO COM FIREBASE 
-######################################################################################################
-
-# CREDENCIAIS DO FIREBASE 
-cred = credentials.Certificate(r"QT_DESIGN\propulsao.json")
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'site-propulsao-allpe.appspot.com'  # Substitua pelo nome do bucket do Firebase
-})
-
-# CONECTAR FIREBASE E STORAGE
-db = firestore.client()
-bucket = storage.bucket()
-
-
-# BAIXA O ARQUIVO COM AS PARTES STL DA PALMILHA 
-def get_file_from_firebase(caminho):
-    try:
-        blob = bucket.blob(caminho)
-        temp_file_path = r"QT_DESIGN\tmp\arquivo_temporario.stl"
-        blob.download_to_filename(temp_file_path)
-        return temp_file_path
-    except Exception as e:
-        print(f"Erro ao baixar arquivo: {e}")
-
-#/PAMLILHAS_STL/19/BASES
-
+from services.api_connector import get_file_from_firebase
 
 
 def get_centroid(your_mesh):
@@ -73,7 +44,7 @@ def esphere_filt(points, radius, self):
         remaining_points = remaining_points[distances > radius]
         process=round((index-len(remaining_points))*100/(index))
         self.loading_label.setText(f"Aplicando filtro de malha . . . ({process}%)")
-        app.processEvents()
+        self.update_screen()
         
     return np.array(filtered_points)
 
@@ -101,8 +72,10 @@ def cut_mesh(mesh: pv.PolyData, axis, cut_value=0) -> pv.PolyData:
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, application):
         super().__init__()
+        self.app = application
+
         self.window_loading = None
         self.window_select_base = None
 
@@ -172,6 +145,9 @@ class MainWindow(QtWidgets.QMainWindow):
         loading_label.setAlignment(QtCore.Qt.AlignCenter)
         loading_label.hide()  # Oculta inicialmente
         return loading_label
+
+    def update_screen(self):
+        self.app.processEvents()
 
     def build_files_list(self):
         # Cleaning the files_info_container to build from scratch
@@ -311,14 +287,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.loading_label.setText("Carregando o Modelo . . .")
 
         self.plotter.interactor.hide()
-        QtWidgets.QApplication.processEvents()  # Atualiza a interface imediatamente
+        self.update_screen()  # Atualiza a interface imediatamente
 
         try:
             # Processa o modelo escaneado
             mesh_scanned = pv.read(file_path)
             # mesh_scanned = cut_mesh(mesh_scanned, 'z', 15)
             self.loading_label.setText("Aplicando filtro de malha . . .")
-            app.processEvents()
+            self.update_screen()
             mesh_scanned = esphere_filt(mesh_scanned.points, 3, self)
 
             self.scanned_file_info = {
@@ -362,17 +338,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.update()  # Atualiza o gráfico sem perder as configurações de exibição
 
     def cut_insole(self):
-        try:
-            result_1 = self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
-            result_2 = self.base_insole_file_info['mesh'].boolean_intersection(self.scanned_file_info['mesh'])
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "Erro", f"ERRO: {e}")
-
-        if result_1.volume > result_2.volume:
-            self.insole_output = result_1
-        else:
-            self.insole_output = result_2
-
+        self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
         self.update_plotter()
 
     def set_camera_view(self, view):
@@ -414,6 +380,6 @@ class MainWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
-    window_main = MainWindow()
+    window_main = MainWindow(app)
     window_main.show()
     sys.exit(app.exec_())
