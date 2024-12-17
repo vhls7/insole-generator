@@ -15,7 +15,7 @@ bucket = storage.bucket()
 def get_file_from_firebase(caminho):
     try:
         blob = bucket.blob(caminho)
-        temp_file_path = r"QT_DESIGN\tmp\arquivo_temporario.stl"
+        temp_file_path = r"QT_DESIGN\tmp\temp_file.stl"
         blob.download_to_filename(temp_file_path)
         return temp_file_path
     except Exception as e:
