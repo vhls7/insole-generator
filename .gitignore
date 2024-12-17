@@ -168,8 +168,8 @@ input_files/CFFFP_CARLOS - Pé Esquerdo.stl
 input_files/CFFFP_Clayton Esquerdo.stl
 INTERFACE_WEB/input_files/CFFFP_Clayton Esquerdo.stl
 INTERFACE_WEB/input_files/ESQ_base45_tipo3_S.stl
-QT_DESIGN/input_files/CFFFP_Clayton Esquerdo.stl
-QT_DESIGN/input_files/ESQ_base45_tipo3_S.stl
-QT_DESIGN/propulsao.json
-QT_DESIGN/tmp/temp_file.stl
+input_files/CFFFP_Clayton Esquerdo.stl
+input_files/ESQ_base45_tipo3_S.stl
+propulsao.json
+tmp/temp_file.stl
 output.stl
