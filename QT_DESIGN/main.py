@@ -125,7 +125,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.findChild(QtWidgets.QDial, "orbitZ").valueChanged.connect(self.update_dial_value)
 
-        self.findChild(QtWidgets.QPushButton, "cutButton").clicked.connect(self.cut_insole)
+        self.cut_btn = self.findChild(QtWidgets.QPushButton, "cutButton")
+        self.cut_btn.clicked.connect(self.cut_insole)
+
+        self.export_btn = self.findChild(QtWidgets.QPushButton, "exportButton")
+        self.export_btn.clicked.connect(self.export_file)
 
         self.findChild(QtWidgets.QPushButton, "topCam").clicked.connect(lambda: self.set_camera_view('top'))
 
@@ -137,8 +141,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.files_info_container = self.findChild(QtWidgets.QVBoxLayout, "filesInfoContainer")
         self.lb_loaded_files = self.findChild(QtWidgets.QLabel, "lb_loaded_files")
-        self.lb_loaded_files.setVisible(False)
         # endregion
+
+        self.enable_buttons()
 
     def create_loading_component(self):
         loading_label = QtWidgets.QLabel("Carregando...")
@@ -198,6 +203,8 @@ class MainWindow(QtWidgets.QMainWindow):
             transparency_slider.setTickInterval(10)
             transparency_slider.valueChanged.connect(lambda value, info=file_info: self.update_mesh_transparency(info['file_name'], value))
             item_vlayout.addWidget(transparency_slider)
+
+        self.enable_buttons()
 
     def update_mesh_transparency(self, file_name, value):
         """Atualiza a transparência da malha com base no valor do slider."""
@@ -348,6 +355,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.reset_camera()
 
         self.build_files_list()
+        self.export_btn.setEnabled(True)
 
     def set_camera_view(self, view):
         views = {
@@ -384,6 +392,51 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotter.reset_camera()
 
         self.build_files_list()
+
+    def export_file(self):
+        # Sugere um nome inicial para o arquivo
+        suggested_name = "output"
+
+        # Define os formatos disponíveis para exportação
+        file_filters = "STL Files (*.stl);;GCODE Files (*.gcode)"
+
+        # Abre o QFileDialog com o nome sugerido e filtros
+        file_name, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            caption="Salvar Arquivo",
+            directory=suggested_name,
+            filter=file_filters
+        )
+
+        if file_name:
+            # Extracts the extension from the selected filter
+            if selected_filter.startswith("STL"):
+                extension = ".stl"
+            elif selected_filter.startswith("GCODE"):
+                extension = ".gcode"
+            else:
+                extension = ""
+
+            # Ensures that the file has the correct extension
+            if not file_name.lower().endswith(extension):
+                file_name += extension
+
+            if extension == ".stl":
+                self.output_insole_file_info['mesh'].save(file_name)
+
+    def enable_buttons(self):
+        is_output_ready = bool(self.output_insole_file_info)
+        if is_output_ready:
+            self.export_btn.setEnabled(True)
+        else:
+            self.export_btn.setEnabled(False)
+
+        is_files_selected = bool(self.scanned_file_info) and bool(self.base_insole_file_info)
+        if is_files_selected:
+            self.cut_btn.setEnabled(True)
+        else:
+            self.cut_btn.setEnabled(False)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
