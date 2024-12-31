@@ -1,6 +1,6 @@
 import sys
 import pyvista as pv
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 from pyvistaqt import QtInteractor  # Importando QtInteractor de pyvistaqt
 import numpy as np
 
