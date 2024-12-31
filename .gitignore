@@ -171,3 +171,8 @@ INTERFACE_WEB/input_files/ESQ_base45_tipo3_S.stl
 QT_DESIGN/input_files/CFFFP_Clayton Esquerdo.stl
 QT_DESIGN/input_files/ESQ_base45_tipo3_S.stl
 QT_DESIGN/main.exe
+input_files/CFFFP_Clayton Esquerdo.stl
+input_files/ESQ_base45_tipo3_S.stl
+propulsao.json
+tmp/temp_file.stl
+output.stl
