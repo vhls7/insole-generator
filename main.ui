@@ -716,7 +716,7 @@ QPushButton:pressed {
                     </size>
                    </property>
                    <property name="minimum">
-                    <number>-90</number>
+                    <number>-180</number>
                    </property>
                    <property name="maximum">
                     <number>90</number>
@@ -791,7 +791,7 @@ QPushButton:pressed {
 </string>
                    </property>
                    <property name="text">
-                    <string>Lateral</string>
+                    <string>Sagital</string>
                    </property>
                    <property name="icon">
                     <iconset resource="resources/resources.qrc">
@@ -830,7 +830,7 @@ QPushButton:pressed {
 </string>
                    </property>
                    <property name="text">
-                    <string>Topo</string>
+                    <string>Transverso</string>
                    </property>
                    <property name="icon">
                     <iconset resource="resources/resources.qrc">

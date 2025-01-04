@@ -301,10 +301,10 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             # Processa o modelo escaneado
             mesh_scanned = pv.read(file_path)
-            mesh_scanned = cut_mesh(mesh_scanned, 'z', 15)
+            mesh_scanned = cut_mesh(mesh_scanned, 'z', 20)
             self.loading_label.setText("Aplicando filtro de malha . . .")
             self.update_screen()
-            mesh_scanned = esphere_filt(mesh_scanned.points, 6, self)
+            mesh_scanned = esphere_filt(mesh_scanned.points, 2, self)
 
             self.scanned_file_info = {
                 'mesh': pv.wrap(mesh_scanned).reconstruct_surface(), # type: ignore
@@ -340,8 +340,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.window_loading_bases.show()
 
     def cut_insole(self):
-        output_mesh = self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
+        output_mesh_difference = self.base_insole_file_info['mesh'].boolean_difference(self.scanned_file_info['mesh'])
+        output_mesh_intersect = self.base_insole_file_info['mesh'].boolean_intersection(self.scanned_file_info['mesh'])
 
+        print(output_mesh_difference.n_cells)
+        print(output_mesh_intersect.n_cells)
+        if output_mesh_difference.n_cells > output_mesh_intersect.n_cells:
+            output_mesh = output_mesh_difference
+        else: 
+            output_mesh = output_mesh_intersect
+            
         # Removing all the selected files
         self.remove_file_item(remove_all=True)
 
