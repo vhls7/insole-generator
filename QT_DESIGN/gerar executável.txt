@@ -1,2 +1,3 @@
     pip install pyinstaller
     pyinstaller.exe --onefile --windowed --icon=icon_exe.ico --exclude PyQt6 main.py
+    pyinstaller.exe --onedir --windowed --icon=icon_exe.ico --noconsole --exclude PyQt6 main.py
