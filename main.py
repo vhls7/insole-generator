@@ -301,7 +301,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             # Processa o modelo escaneado
             mesh_scanned = pv.read(file_path)
-            mesh_scanned = cut_mesh(mesh_scanned, 'z', 20)
+            mesh_scanned = cut_mesh(mesh_scanned, 'z', 30)
             self.loading_label.setText("Aplicando filtro de malha . . .")
             self.update_screen()
             mesh_scanned = esphere_filt(mesh_scanned.points, 2, self)
@@ -379,8 +379,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def load_base_insole(self, message, side):
 
         base_name = message
-        temp_file_name = get_file_from_firebase(base_name)
-        param_insole_mesh = pv.read(temp_file_name)
+        #temp_file_name = get_file_from_firebase(base_name)
+        #param_insole_mesh = pv.read(temp_file_name)
+        param_insole_mesh = pv.read('./BASE-01.STL')
 
         if side == 'Esquerdo':
             param_insole_mesh.reflect((1, 0, 0), point=(0, 0, 0), inplace=True)
